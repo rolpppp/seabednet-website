@@ -110,53 +110,63 @@ T002). Never tick a task whose test is red.
 All of `globals.css` is one file, so T018 to T022 run in order. Values come from `docs/design-system.md` §5.1, §6, §7,
 §12 and §15, transcribed exactly.
 
-- [ ] T017 Write failing test `frontend/tests/unit/tokens.test.ts`: every `--ds-*` appears once as a declaration; the
+- [x] T017 Write failing test `frontend/tests/unit/tokens.test.ts`: every `--ds-*` appears once as a declaration; the
   shadcn semantic names listed in DS §15 exist; the `.ws` block and the `prefers-color-scheme: dark` block contain only
   `var()` references and no hex literals; the eleven type utilities exist (`text-display`, `text-h1`, `text-h2`,
   `text-h3`, `text-h4`, `text-body`, `text-body-long`, `text-small`, `text-caption`, `text-data`, `text-code`) —
   files: `frontend/tests/unit/tokens.test.ts` — satisfies: US2-1, FR-002, FR-004
-- [ ] T018 Create `frontend/app/globals.css` with `@import "tailwindcss";` and the raw palette in `:root` using the
+- [x] T018 Create `frontend/app/globals.css` with `@import "tailwindcss";` and the raw palette in `:root` using the
   `--ds-` prefix (all names in plan §4.1 step 2: light, workspace, `--ds-well`, on-ocean pair, radii, shadows,
   easing, durations). Each value written once — files: `frontend/app/globals.css` — satisfies: FR-002, US2-1,
   plan R1
-- [ ] T019 In `globals.css` add the semantic layer with shadcn names from DS §15 as `var(--ds-…)` references (light in
+- [x] T019 In `globals.css` add the semantic layer with shadcn names from DS §15 as `var(--ds-…)` references (light in
   `:root`), the `.ws` remap, and the `@media (prefers-color-scheme: dark) { :root { … } }` remap; `color-scheme: light
   dark` on `:root`, `dark` on `.ws` — files: `frontend/app/globals.css` — satisfies: FR-002, US1-3, US2-1
-- [ ] T020 In `globals.css` add `@theme inline` mappings: semantic colours and DS-only roles (`text-ocean`,
+- [x] T020 In `globals.css` add `@theme inline` mappings: semantic colours and DS-only roles (`text-ocean`,
   `bg-ocean-soft`, `bg-amber-soft`, `bg-well`, `text-success`, …), radii `rounded-tag/control/card/well`, 4 px spacing
   base, easing and duration tokens, font families `--font-sans/serif/mono`, and `--container-nav: 47.5rem` (gives
   `@nav:`) — files: `frontend/app/globals.css` — satisfies: FR-002, FR-004, US1-2 (760 px)
-- [ ] T021 In `globals.css` add the eleven `@utility` type classes per DS §5.1 with `--text-*` theme values and the
+- [x] T021 In `globals.css` add the eleven `@utility` type classes per DS §5.1 with `--text-*` theme values and the
   < 640 px container-width reductions (`display` 36/44, `h1` 28/36); `text-data` uses tabular figures — files:
   `frontend/app/globals.css` — satisfies: FR-004
-- [ ] T022 In `globals.css` add the base layer: `body` Inter with `font-feature-settings: "cv11", "ss01"`; global
+- [x] T022 In `globals.css` add the base layer: `body` Inter with `font-feature-settings: "cv11", "ss01"`; global
   `:focus-visible` (2 px `--ring` outline, 2 px offset, never `outline: none`); hover rules only under `(hover:hover)
   and (pointer:fine)`; `(pointer: coarse)` raises control heights to 44 px; `.ph` dashed-underline style; the
   `prefers-reduced-motion: reduce` block (transforms off, transitions and animations ≤ 120 ms, `scroll-behavior:
   auto`) — files: `frontend/app/globals.css` — satisfies: FR-008, FR-009, edge: reduced motion, Art. III
-- [ ] T023 Run `tokens.test.ts` (green) and `next build` (compiles the stylesheet). Fix any token that appears twice or
+- [x] T023 Run `tokens.test.ts` (green) and `next build` (compiles the stylesheet). Fix any token that appears twice or
   any hex inside `.ws` or the dark block — files: `frontend/app/globals.css` — satisfies: US2-1, FR-002, FR-004
-- [ ] T024 Load the fonts in `frontend/app/layout.tsx`: `Inter`, `Source_Serif_4` (variable, `axes: ["opsz"]`),
+- [x] T024 Load the fonts in `frontend/app/layout.tsx`: `Inter`, `Source_Serif_4` (variable, `axes: ["opsz"]`),
   `JetBrains_Mono` (400, 500) from `next/font/google`, `display: "swap"`, `variable:` names, the three classes on
   `<html lang="en">`; add the skip link (`<a href="#main">`) and metadata. `@theme` font vars already point at them
   (T020). **(network: build downloads fonts)** — files: `frontend/app/layout.tsx` — satisfies: FR-003, US1-4, edge: font
   failure
-- [ ] T025 Open check: confirm the served Inter file keeps `cv11` and `ss01`. After `next build`, find the Inter woff2
+- [x] T025 Open check: confirm the served Inter file keeps `cv11` and `ss01`. After `next build`, find the Inter woff2
   in `<distDir>/static/media/` and inspect its GSUB features (for example `uv run --with fonttools python -I -c ...`
   into a scratch folder; write nothing into the repo). Note the result below this line. **(network for the
   fonttools fetch)** — files: none — satisfies: FR-003, plan R11
-- [ ] T026 **(conditional: only if T025 shows the features are missing)** Switch Inter to `next/font/local`: add the
+  **Result (2026-10-29):** Inter as served by `next/font/google` (Google Fonts subsets) does NOT keep `cv11` or `ss01`.
+  The latin Inter woff2 (`ba63f6a0…woff2`, 879 glyphs, axis `wght` only) has GSUB features `ccmp, locl, pnum, tnum`
+  only; no other Inter subset has them either. T026 is therefore needed.
+- [x] T026 **(conditional: only if T025 shows the features are missing)** Switch Inter to `next/font/local`: add the
   OFL files from rsms/inter and the licence text under `frontend/app/fonts/`, update `layout.tsx`, re-run T025's check.
   **(network)** — files: `frontend/app/fonts/` (new), `frontend/app/layout.tsx` — satisfies: FR-003, plan §4.2
+  **Result (2026-10-29):** Done with the official rsms/inter release v4.1 (`Inter-4.1.zip`, `web/InterVariable.woff2`);
+  its GSUB has `cv11` and `ss01` (axes `opsz` 14–32, `wght` 100–900). Copied files:
+  `frontend/app/fonts/InterVariable.woff2` 352240 bytes, SHA-256
+  `693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3`; `frontend/app/fonts/Inter-LICENSE.txt` 4380
+  bytes, SHA-256 `262481e844521b326f5ecd053e59b98c8b2da78c8ee1bdbb6e8174305e54935a`. No italic (DS and plan use none).
+  After `next build` the Inter file in `.next/static/media/` is byte-identical (same SHA-256) and keeps both features.
+  Size is larger than the plan's ~100 KB estimate (full variable font with the opsz axis).
 
 ## Phase 3 — Site shell and placeholder routes
 
 Tests first (T027 to T030), then the code (T031 to T039), then the run (T040).
 
-- [ ] T027 [P] Write failing test `frontend/tests/unit/nav.test.ts`: `isActive("/", "/")` true; `isActive("/results/x",
+- [x] T027 [P] Write failing test `frontend/tests/unit/nav.test.ts`: `isActive("/", "/")` true; `isActive("/results/x",
   "/results")` true; `isActive("/results", "/")` false; `/` never matches other paths — files:
   `frontend/tests/unit/nav.test.ts` — satisfies: US1-1
-- [ ] T028 [P] Write failing test `frontend/tests/e2e/shell.spec.ts` (project `prod`): for each of `/`, `/try`,
+- [x] T028 [P] Write failing test `frontend/tests/e2e/shell.spec.ts` (project `prod`): for each of `/`, `/try`,
   `/results`, `/about`, `/explore` and the 404 route — exactly one `<h1>`; nav shows wordmark, Explore, Try it, Results,
   About, GitHub, Thesis; current item has `aria-current="page"` and a 2 px underline; no `/lab` link in nav; the
   placeholder line "coming in feature NNN" on the five pages; `/lab` returns 200; GitHub renders as "GitHub (link
@@ -165,58 +175,58 @@ Tests first (T027 to T030), then the code (T031 to T039), then the run (T040).
   show and Menu is hidden; with `javaScriptEnabled: false` all links exist and the menu opens; at 320 px
   `scrollWidth <= innerWidth` on every route — files: `frontend/tests/e2e/shell.spec.ts` — satisfies: US1-1, US1-2,
   FR-006, FR-007, edge: JS off, edge: 320 px, SC-005
-- [ ] T029 [P] Write failing test `frontend/tests/e2e/theme.spec.ts`: with dark colour scheme emulated, `/results`
+- [x] T029 [P] Write failing test `frontend/tests/e2e/theme.spec.ts`: with dark colour scheme emulated, `/results`
   background equals the workspace background token read from the page (`--ds-ws-bg`); with light emulated, `/` uses
   the light token; `/try` and `/lab` use the workspace token in both OS modes. No literal colours in the test —
   files: `frontend/tests/e2e/theme.spec.ts` — satisfies: US1-3, FR-002
-- [ ] T030 [P] Write failing test `frontend/tests/e2e/fonts-network.spec.ts`: on every route, record all requests and
+- [x] T030 [P] Write failing test `frontend/tests/e2e/fonts-network.spec.ts`: on every route, record all requests and
   assert each origin is the app origin (zero third-party, including Google); woff2 requests come from
   `/_next/static/media/`; computed families resolve to Inter, Source Serif 4 and JetBrains Mono and `document.fonts`
   reports them loaded; with the woff2 route blocked, `document.body.scrollWidth` does not change and the `<h1>` height
   changes by no more than a few px — files: `frontend/tests/e2e/fonts-network.spec.ts` — satisfies: US1-4, SC-004, edge:
   font failure, FR-003
-- [ ] T031 Create `frontend/lib/nav.ts` with `isActive(pathname, href)` (exact for `/`, prefix for others) so T027
+- [x] T031 Create `frontend/lib/nav.ts` with `isActive(pathname, href)` (exact for `/`, prefix for others) so T027
   passes — files: `frontend/lib/nav.ts` — satisfies: US1-1
-- [ ] T032 Create `frontend/lib/site.ts`: nav items (Explore, Try it, Results, About; no `/lab`), right-hand items,
+- [x] T032 Create `frontend/lib/site.ts`: nav items (Explore, Try it, Results, About; no `/lab`), right-hand items,
   `GITHUB_URL: string | null = null`, and the credit text exported in parts `credits.jodd`, `credits.joddPaper`,
   `credits.joddSeg`, `credits.backbones`, plus `joddLicenceLine` ("CC BY-NC-SA 4.0, JAMSTEC, scientific and educational
   use") and both citations (Handoff §1 DOI `10.1016/j.dib.2026.112462`; DS §16 dataset DOI `10.17596/0004035`, 2025).
   Copy wording from Handoff §1 and DS §16 verbatim; do not invent facts. Text only, no metrics — files:
   `frontend/lib/site.ts` — satisfies: FR-006, US1-1, plan §10 (credits in parts, GITHUB_URL), plan R2, plan R3,
   Art. VIII.3
-- [ ] T033 [P] Create `frontend/components/icons.tsx` (chevron, arrow, handle chevrons; inline SVG, `aria-hidden`,
+- [x] T033 [P] Create `frontend/components/icons.tsx` (chevron, arrow, handle chevrons; inline SVG, `aria-hidden`,
   `currentColor`) and `frontend/components/layout/lens-mark.tsx` (small amber dot glyph using token colours) — files:
   `frontend/components/icons.tsx`, `frontend/components/layout/lens-mark.tsx` — satisfies: FR-006, FR-005
-- [ ] T034 Create `frontend/components/layout/nav-links.tsx` (`"use client"`): `usePathname` + `isActive` set
+- [x] T034 Create `frontend/components/layout/nav-links.tsx` (`"use client"`): `usePathname` + `isActive` set
   `aria-current="page"` and the 2 px `--primary` underline; closes the `<details>` menu on route change and on Esc and
   returns focus to the summary — files: `frontend/components/layout/nav-links.tsx` — satisfies: US1-1, US1-2, FR-008
-- [ ] T035 Create `frontend/components/layout/site-nav.tsx` (server component): `<header>` with `container-type:
+- [x] T035 Create `frontend/components/layout/site-nav.tsx` (server component): `<header>` with `container-type:
   inline-size`; wordmark link "SeaBed Lens" with `lens-mark`; inline link list and right-hand list shown from `@nav:`;
   below that a native `<details><summary>Menu</summary>` with the same links; only one link set displayed at a time;
   GitHub renders as `<span class="ph">GitHub (link pending)</span>` while `GITHUB_URL` is null; Thesis → `/about` —
   files: `frontend/components/layout/site-nav.tsx` — satisfies: US1-1, US1-2, FR-006, edge: JS off, plan R2
-- [ ] T036 [P] Create `frontend/components/layout/site-footer.tsx` (credit lines, licence line and both citations from
+- [x] T036 [P] Create `frontend/components/layout/site-footer.tsx` (credit lines, licence line and both citations from
   `lib/site.ts`; `text-caption`, `text-muted-foreground`) and `frontend/components/layout/page-title.tsx` (the one serif
   `<h1>` at the h1 scale, optional `note` line) — files: `frontend/components/layout/site-footer.tsx`,
   `frontend/components/layout/page-title.tsx` — satisfies: FR-006, Art. VIII.3
-- [ ] T037 Create `frontend/components/layout/shell.tsx` (shared internal Shell: flex-column body, `SiteNav`,
+- [x] T037 Create `frontend/components/layout/shell.tsx` (shared internal Shell: flex-column body, `SiteNav`,
   `<main id="main">` flex-1 with 16 px minimum gutter, `SiteFooter`), `reading-layout.tsx` (`width?: "prose" | "wide"`,
   720 px prose) and `workspace-layout.tsx` (same shell inside `<div class="ws">`). `shell.tsx` is an addition to the
   plan's tree (the plan names "one internal Shell component" but no file) — files:
   `frontend/components/layout/shell.tsx`, `frontend/components/layout/reading-layout.tsx`,
   `frontend/components/layout/workspace-layout.tsx` — satisfies: FR-006, US1-3
-- [ ] T038 [P] Create the route-group layouts and 404: `frontend/app/(reading)/layout.tsx` (`ReadingLayout`),
+- [x] T038 [P] Create the route-group layouts and 404: `frontend/app/(reading)/layout.tsx` (`ReadingLayout`),
   `frontend/app/(workspace)/layout.tsx` (`WorkspaceLayout`), `frontend/app/not-found.tsx` (inside `ReadingLayout`) —
   files: `frontend/app/(reading)/layout.tsx`, `frontend/app/(workspace)/layout.tsx`, `frontend/app/not-found.tsx` —
   satisfies: FR-006, FR-007, US1-3
-- [ ] T039 Create the placeholder pages with `PageTitle` and the one-line "coming in feature NNN" note: replace
+- [x] T039 Create the placeholder pages with `PageTitle` and the one-line "coming in feature NNN" note: replace
   `(reading)/page.tsx` (`/`, feature 004), add `(reading)/results/page.tsx` (006), `(reading)/about/page.tsx` (007),
   `(reading)/explore/page.tsx` (009), `(workspace)/try/page.tsx` (005), `(workspace)/lab/page.tsx` (008). No dynamic
   APIs on the reading pages; no `"use client"` data fetching — files: `frontend/app/(reading)/page.tsx`,
   `frontend/app/(reading)/results/page.tsx`, `frontend/app/(reading)/about/page.tsx`,
   `frontend/app/(reading)/explore/page.tsx`, `frontend/app/(workspace)/try/page.tsx`,
   `frontend/app/(workspace)/lab/page.tsx` — satisfies: FR-007, FR-012, US1-1
-- [ ] T040 Run `nav.test.ts`, then `next build` and `shell.spec.ts`, `theme.spec.ts`, `fonts-network.spec.ts` on the
+- [x] T040 Run `nav.test.ts`, then `next build` and `shell.spec.ts`, `theme.spec.ts`, `fonts-network.spec.ts` on the
   `prod` project; fix until green. If a spec fails because of the spec or plan (not the code), stop and report —
   files: whichever of T031 to T039 failed — satisfies: US1-1, US1-2, US1-3, US1-4, SC-004, SC-005 (partial), edge: JS
   off, edge: font failure
