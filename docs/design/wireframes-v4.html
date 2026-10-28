@@ -1,0 +1,1331 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>SeaBed Lens Design System</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* SeaBed Lens v4 — "Quiet Scientific".
+   Three visible layers at most: page, content surface, emphasis. Typography and whitespace group things before
+   borders do. Ocean teal is the brand and the action colour; amber is rare. The image well stays neutral grey. */
+:root{
+  /* Light reading surface */
+  --bg:#F7F8F6; --surface:#FFFFFF; --subtle:#EEF1F0; --border:#D9DEDC;
+  --text:#17211F; --text-2:#66716D; --muted:#8A9591;
+  --ocean:#087E8B; --ocean-hover:#05616A; --ocean-soft:#E3F2F3; --on-ocean:#FFFFFF;
+  --amber:#E7A93B; --amber-soft:#FFF3D8;
+  --success:#23845B; --error:#C94B4B; --info:#3D7FC4;
+  /* Dark workspace: fixed in both themes */
+  --ws-bg:#0B1516; --ws-surface:#101D1E; --ws-subtle:#172526; --ws-border:#263536;
+  --ws-text:#E9EFED; --ws-text-2:#9AA8A5; --ws-muted:#74827E;
+  --ws-ocean:#55B8C0; --ws-ocean-soft:#183638; --ws-amber:#EAB45D;
+  --well:#17191B;   /* neutral, chroma 0.005: the one surface that touches the image */
+
+  --font-serif:"Source Serif 4","Iowan Old Style",Georgia,serif;
+  --font-sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+  --r-tag:5px; --r-ctl:7px; --r-card:10px; --r-well:12px;
+  --pop-shadow:0 1px 2px rgb(23 33 31 / .06), 0 8px 24px rgb(23 33 31 / .12);
+  --ease-out:cubic-bezier(0.23,1,0.32,1); --ease-drawer:cubic-bezier(0.32,0.72,0,1);
+  --d-press:120ms; --d-micro:160ms; --d-ui:220ms; --d-sheet:360ms;
+  interpolate-size:allow-keywords;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0B1516; --surface:#101D1E; --subtle:#172526; --border:#263536;
+  --text:#E9EFED; --text-2:#9AA8A5; --muted:#74827E;
+  --ocean:#55B8C0; --ocean-hover:#79C9CF; --ocean-soft:#183638; --on-ocean:#0B1516;
+  --amber:#EAB45D; --amber-soft:#2A2416; --pop-shadow:0 8px 24px rgb(0 0 0 / .45);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0B1516; --surface:#101D1E; --subtle:#172526; --border:#263536;
+  --text:#E9EFED; --text-2:#9AA8A5; --muted:#74827E;
+  --ocean:#55B8C0; --ocean-hover:#79C9CF; --ocean-soft:#183638; --on-ocean:#0B1516;
+  --amber:#EAB45D; --amber-soft:#2A2416; --pop-shadow:0 8px 24px rgb(0 0 0 / .45);
+  color-scheme:dark;
+}
+/* Workspace scope remaps the same names, so components need no variants */
+.ws{--bg:var(--ws-bg); --surface:var(--ws-surface); --subtle:var(--ws-subtle); --border:var(--ws-border);
+  --text:var(--ws-text); --text-2:var(--ws-text-2); --muted:var(--ws-muted);
+  --ocean:var(--ws-ocean); --ocean-hover:#79C9CF; --ocean-soft:var(--ws-ocean-soft); --on-ocean:var(--ws-bg);
+  --amber:var(--ws-amber); --amber-soft:#2A2416; --pop-shadow:0 8px 24px rgb(0 0 0 / .45);
+  background:var(--ws-bg); color:var(--ws-text); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:1rem;line-height:1.5625;
+  font-feature-settings:"cv11","ss01";-webkit-font-smoothing:antialiased;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 var(--s9)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+h1,h2,h3,h4{margin:0;font-weight:500;text-wrap:balance}
+p{margin:0;text-wrap:pretty}
+a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px;text-decoration-color:var(--muted)}
+@media (hover:hover){a:hover{text-decoration-color:currentColor}}
+code,.mono{font-family:var(--font-mono);font-size:.8125rem;line-height:1.1875rem}
+:focus-visible{outline:2px solid var(--ocean);outline-offset:2px;border-radius:3px}
+.num{font-variant-numeric:tabular-nums}
+.t2{color:var(--text-2)} .small{font-size:.875rem;line-height:1.25rem} .cap{font-size:.75rem;line-height:1.0625rem}
+
+/* type scale */
+.display{font-family:var(--font-serif);font-size:3rem;line-height:3.5rem;font-weight:400;letter-spacing:-.01em}
+.h1{font-family:var(--font-serif);font-size:2.25rem;line-height:2.75rem;font-weight:400}
+.h2{font-size:1.75rem;line-height:2.25rem;font-weight:500;letter-spacing:-.005em}
+.h2.serif{font-family:var(--font-serif);font-weight:400}
+.h3{font-size:1.3125rem;line-height:1.75rem;font-weight:500}
+.h3.serif{font-family:var(--font-serif);font-weight:400}
+.h4{font-size:1.0625rem;line-height:1.5rem;font-weight:600}
+@container (max-width:640px){.display{font-size:2.25rem;line-height:2.75rem}.h1{font-size:1.75rem;line-height:2.25rem}}
+
+/* ---------- doc shell (the reference page itself follows the same rules) ---------- */
+.doc{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:180px minmax(0,1fr);gap:var(--s7)}
+@media (max-width:900px){.doc{grid-template-columns:minmax(0,1fr);gap:0}.rail{display:none}}
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--s5));align-self:start;padding-top:var(--s8);font-size:.875rem;line-height:1.25rem}
+.rail ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.rail a{display:block;text-decoration:none;color:var(--text-2);padding:4px 0}
+.rail .sub a{padding-left:12px;font-size:.8125rem}
+@media (hover:hover){.rail a:hover{color:var(--text)}}
+.rail .theme{margin-top:var(--s6);display:grid;gap:4px;font-size:.75rem;color:var(--text-2)}
+main{min-width:0}
+.masthead{padding-block:var(--s8) var(--s7);display:grid;gap:var(--s4);max-width:66ch}
+.masthead .lead{color:var(--text-2);font-size:1.0625rem;line-height:1.625rem}
+.changes{margin:var(--s2) 0 0;padding:0 0 0 1.1em;display:grid;gap:6px;color:var(--text-2);font-size:.875rem;line-height:1.375rem}
+.changes b{color:var(--text);font-weight:500}
+section.block{padding-block:var(--s8);display:grid;gap:var(--s6);border-top:1px solid var(--border)}
+section.block > header{display:grid;gap:var(--s2);max-width:66ch}
+.lede{color:var(--text-2)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:var(--s6) var(--s7)}
+.cols > div{min-width:0;display:grid;gap:var(--s2);align-content:start}
+.note{font-size:.875rem;line-height:1.375rem;color:var(--text-2);max-width:66ch}
+
+/* editorial table: no card, hairline rows, strong alignment */
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.875rem;line-height:1.25rem;font-variant-numeric:tabular-nums}
+th,td{padding:10px 16px 10px 0;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+th{font-weight:500;color:var(--text-2);font-size:.8125rem;white-space:nowrap}
+thead tr:last-child th{border-bottom-color:var(--text)}
+tbody tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;padding-right:0;padding-left:16px}
+td.n + td:not(.n):not(.gap),th.n + th:not(.n):not(.gap){padding-left:24px}
+td b{font-weight:600}
+th.grp{text-align:right;color:var(--text);border-bottom:1px solid var(--text);padding-bottom:6px}
+th.grp.l{text-align:left}
+th.gap,td.gap{width:24px;padding:0;border-bottom-color:transparent}
+td.alt,th.alt{color:var(--text-2)}
+.pr td:first-child{width:30%;padding-right:var(--s5)}
+.pr td:first-child b{display:block;font-weight:500}
+.pr td:first-child span{color:var(--text-2);font-size:.8125rem}
+
+/* swatches and specimens */
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:var(--s3) var(--s5)}
+.swatches div{display:grid;grid-template-columns:32px minmax(0,1fr);gap:var(--s3);align-items:center}
+.swatches i{width:32px;height:32px;border-radius:var(--r-tag);box-shadow:inset 0 0 0 1px rgb(0 0 0 / .08)}
+.swatches b{display:block;font-weight:500;font-size:.875rem;line-height:1.25rem}
+.swatches span{font-size:.75rem;color:var(--text-2)}
+.swatches code{font-size:.75rem}
+.ws-panel{background:var(--ws-bg);color:var(--ws-text);border-radius:var(--r-card);padding:var(--s5)}
+.ws-panel .swatches span{color:var(--ws-text-2)}
+.ws-panel .swatches i{box-shadow:inset 0 0 0 1px rgb(255 255 255 / .12)}
+.classgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;background:var(--well);padding:var(--s4);border-radius:var(--r-card)}
+.classgrid span{display:flex;align-items:center;gap:8px;font-size:.75rem;color:var(--ws-text)}
+.classgrid i{width:14px;height:14px;border-radius:3px;flex:none;border:1.5px solid currentColor}
+.scale > div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:var(--s5);align-items:baseline;padding-block:var(--s3);border-bottom:1px solid var(--border)}
+.scale > div:last-child{border-bottom:0}
+.scale small{color:var(--text-2);font-size:.75rem}
+@media (max-width:560px){.scale > div{grid-template-columns:minmax(0,1fr);gap:2px}}
+.rules{margin:0;padding:0 0 0 1.1em;display:grid;gap:6px;font-size:.875rem;line-height:1.375rem;color:var(--text-2)}
+.rules b{color:var(--text);font-weight:500}
+
+/* ---------- components ---------- */
+.btn{font:inherit;font-size:.875rem;line-height:1.25rem;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;
+  border-radius:var(--r-ctl);border:1px solid transparent;cursor:pointer;text-decoration:none;white-space:nowrap;color:var(--text);background:transparent;
+  transition:background-color var(--d-micro) ease,border-color var(--d-micro) ease,color var(--d-micro) ease,transform var(--d-press) var(--ease-out)}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--ocean);color:var(--on-ocean)}
+.btn-secondary{background:var(--surface);border-color:var(--muted)}           /* Muted clears 3:1 as a boundary on white */
+.btn-text{padding:0 4px;color:var(--text);text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:4px}
+.btn-text .arr{transition:transform var(--d-micro) var(--ease-out)}
+@media (hover:hover) and (pointer:fine){
+  .btn-primary:hover{background:var(--ocean-hover)}
+  .btn-secondary:hover{background:var(--subtle)}
+  .btn-text:hover{color:var(--ocean);text-decoration-color:currentColor}.btn-text:hover .arr{transform:translateX(2px)}}
+.btn-sm{min-height:32px;padding:0 12px;font-size:.8125rem}
+.btn-text.btn-sm{padding:0 2px}
+@media (pointer:coarse){.btn,.btn-sm{min-height:44px}}
+.btn svg{flex:none}
+.row{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s3);align-items:center}
+
+/* input */
+.field{display:grid;gap:6px;max-width:340px}
+.field label{font-size:.875rem;font-weight:500}
+.input{font:inherit;font-size:.9375rem;min-height:40px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--muted);background:var(--surface);color:var(--text);transition:border-color var(--d-micro) ease,box-shadow var(--d-micro) ease}
+.input::placeholder{color:var(--text-2)}
+.input:focus{outline:none;border-color:var(--ocean);box-shadow:0 0 0 1px var(--ocean)}
+
+/* understated tabs: text, active gets a 2px underline */
+.utabs{display:flex;gap:var(--s5);border-bottom:1px solid var(--border)}
+.utabs button{font:inherit;font-size:.875rem;font-weight:500;background:none;border:0;padding:10px 0 9px;margin-bottom:-1px;border-bottom:2px solid transparent;color:var(--text-2);cursor:pointer;min-height:40px;
+  transition:color var(--d-micro) ease,border-color var(--d-micro) ease}
+.utabs button[aria-selected="true"],.utabs button[aria-pressed="true"]{color:var(--text);border-bottom-color:var(--ocean)}
+@media (hover:hover){.utabs button:hover{color:var(--text)}}
+@media (pointer:coarse){.utabs button{min-height:44px}}
+
+/* badges: status only */
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;line-height:1rem;font-weight:500;padding:3px 8px;border-radius:var(--r-tag);white-space:nowrap;background:var(--subtle);color:var(--text)}
+.badge i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+.badge.ok{color:var(--success)} .badge.err{color:var(--error)} .badge.run{background:var(--amber-soft);color:var(--text)} .badge.run i{background:var(--amber)}
+.badge.null{color:var(--text-2);white-space:normal}
+
+/* source line: one quiet sentence */
+.src{font-size:.8125rem;line-height:1.25rem;color:var(--text-2);display:flex;flex-wrap:wrap;gap:4px 16px;align-items:baseline}
+.src a{color:var(--text-2)}
+@media (hover:hover){.src a:hover{color:var(--ocean)}}
+.ph{color:var(--text-2);border-bottom:1px dashed var(--muted)}
+
+/* footnote: a small ocean numeral; provenance on hover, focus or click */
+.fn{position:relative;display:inline}
+.fn > button{font:inherit;font-size:.7em;line-height:1;vertical-align:super;color:var(--ocean);background:none;border:0;padding:0 1px;margin-left:1px;cursor:pointer;font-variant-numeric:tabular-nums}
+.fn .card{position:absolute;top:calc(100% + 6px);left:-12px;z-index:20;width:min(280px,72vw);background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--pop-shadow);
+  padding:12px 14px;font-size:.8125rem;line-height:1.25rem;font-weight:400;display:none;
+  opacity:0;transform:translateY(-2px);transition:opacity var(--d-micro) var(--ease-out),transform var(--d-micro) var(--ease-out),display var(--d-micro) allow-discrete}
+.fn:hover .card,.fn:focus-within .card{display:block;opacity:1;transform:none}
+@starting-style{.fn:hover .card,.fn:focus-within .card{opacity:0;transform:translateY(-2px)}}
+@media (max-width:560px){.fn .card{position:fixed;top:auto;left:16px;right:16px;bottom:16px;width:auto}}
+.card b{display:block;font-weight:500;margin-bottom:4px}
+.card .line{display:block;color:var(--text-2)}
+.card code{font-size:.75rem;color:var(--text)}
+
+/* controls */
+.ctl{display:grid;gap:6px}
+.ctl label{font-size:.875rem;font-weight:500;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.ctl output{font-weight:400;color:var(--text-2);font-variant-numeric:tabular-nums}
+.hint{font-size:.8125rem;line-height:1.25rem;color:var(--text-2)}
+input[type=range]{width:100%;accent-color:var(--ocean);height:24px;margin:0}
+@media (pointer:coarse){input[type=range]{height:40px}}
+.switch{display:flex;gap:10px;align-items:flex-start;font-size:.875rem;cursor:pointer}
+.switch input{appearance:none;width:32px;height:18px;border-radius:9px;background:var(--muted);position:relative;flex:none;margin:2px 0 0;cursor:pointer;transition:background-color var(--d-micro) ease}
+.switch input::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--surface);transition:transform var(--d-micro) var(--ease-out)}
+.switch input:checked{background:var(--ocean)}
+.switch input:checked::after{transform:translateX(14px)}
+
+/* collapsible: opens with height + opacity where ::details-content is supported, snaps elsewhere */
+details.more summary{cursor:pointer;font-size:.875rem;font-weight:500;list-style:none;display:flex;align-items:center;gap:8px;min-height:40px}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::after{content:"";width:7px;height:7px;margin-left:auto;margin-right:3px;border-right:1.5px solid var(--text-2);border-bottom:1.5px solid var(--text-2);transform:rotate(45deg) translateY(-2px);transition:transform var(--d-micro) var(--ease-out)}
+details.more[open] summary::after{transform:rotate(225deg) translateY(-2px)}
+details.more::details-content{height:0;opacity:0;overflow:clip;transition:height var(--d-ui) var(--ease-out),opacity var(--d-micro) ease-out,content-visibility var(--d-ui) allow-discrete}
+details.more[open]::details-content{height:auto;opacity:1}
+details.more > div{display:grid;gap:14px;padding:4px 0 8px}
+@media (prefers-reduced-motion: reduce){details.more::details-content{transition-duration:0s}}
+
+/* image well, overlays */
+.well{position:relative;background:var(--well);border-radius:var(--r-well);overflow:hidden;aspect-ratio:4/3;max-width:100%;isolation:isolate}
+.well canvas,.well svg.ov{position:absolute;inset:0;width:100%;height:100%;display:block}
+.well canvas{transition:opacity var(--d-ui) var(--ease-out)}
+.well svg.ov{transition:opacity var(--d-ui) var(--ease-out)}
+.well svg .lbl{font-family:var(--font-sans);font-size:13px;font-weight:500;pointer-events:none}
+.well svg path[data-i]{cursor:pointer}
+.well.busy svg.ov{opacity:.3}
+@media (prefers-reduced-motion: reduce){.well canvas,.well svg.ov{transition-duration:120ms}}
+/* run status: fades and lifts 4px in, fades out */
+.status{position:absolute;left:50%;bottom:14px;transform:translate(-50%,0);z-index:4;display:none;align-items:center;gap:10px;background:rgb(11 21 22 / .88);color:var(--ws-text);border-radius:var(--r-ctl);padding:8px 14px;font-size:.8125rem;white-space:nowrap;
+  opacity:0;transition:opacity 120ms ease-out,transform var(--d-micro) var(--ease-out),display 160ms allow-discrete}
+.well.busy .status{display:inline-flex;opacity:1;transition:opacity var(--d-micro) var(--ease-out),transform var(--d-micro) var(--ease-out),display 160ms allow-discrete}
+@starting-style{.well.busy .status{opacity:0;transform:translate(-50%,4px)}}
+@media (prefers-reduced-motion: reduce){@starting-style{.well.busy .status{transform:translate(-50%,0)}}}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--ws-amber);animation:pulse 1.2s linear infinite}
+@keyframes pulse{50%{opacity:.3}}
+@media (prefers-reduced-motion: reduce){.status i{animation:none}}
+.wcap{position:absolute;z-index:3;font-size:.75rem;line-height:1rem;font-weight:500;color:var(--ws-text);background:rgb(11 21 22 / .7);padding:4px 8px;border-radius:var(--r-tag)}
+.swipe input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0;z-index:2}
+.swipe .handle{position:absolute;top:0;bottom:0;width:2px;background:var(--ws-text);z-index:2;pointer-events:none;transform:translateX(-1px)}
+.swipe .handle::after{content:"";position:absolute;top:50%;left:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;
+  background:var(--ws-text) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18' fill='none' stroke='%230B1516' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 5 3 9l4 4M11 5l4 4-4 4'/%3E%3C/svg%3E") center/18px no-repeat;
+  box-shadow:0 1px 6px rgb(0 0 0 / .4)}
+.swipe input:focus-visible ~ .handle::after{outline:2px solid var(--ws-ocean);outline-offset:2px}
+.swipe .side-l{left:12px;top:12px} .swipe .side-r{right:12px;top:12px}
+
+/* ---------- frames ---------- */
+.frame{border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden;background:var(--bg);container-type:inline-size;min-width:0}
+.chrome{display:flex;gap:8px;align-items:center;padding:8px 12px;background:var(--subtle);border-bottom:1px solid var(--border)}
+.chrome i{width:9px;height:9px;border-radius:50%;background:var(--border)}
+.chrome .url{flex:1;min-width:0;font-size:.75rem;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:6px}
+.wf-h{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--s3);align-items:baseline;margin-top:var(--s7)}
+.wf-h span{font-size:.8125rem;color:var(--text-2)}
+.why{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:var(--s4) var(--s6);font-size:.875rem;line-height:1.375rem;color:var(--text-2);margin:var(--s4) 0 0;padding:0;list-style:none}
+.why b{display:block;color:var(--text);font-weight:500}
+
+/* site nav */
+.s-nav{display:flex;align-items:center;gap:var(--s6);padding:14px 24px;background:var(--bg)}
+.ws .s-nav,.s-nav.line{border-bottom:1px solid var(--border)}
+.wordmark{display:inline-flex;gap:8px;align-items:center;font-weight:600;font-size:.9375rem;text-decoration:none;color:var(--text);white-space:nowrap;letter-spacing:-.005em}
+.s-nav ul{list-style:none;display:flex;gap:var(--s5);margin:0;padding:0;font-size:.875rem}
+.s-nav li a{display:block;padding:6px 0;text-decoration:none;color:var(--text-2);white-space:nowrap;border-bottom:2px solid transparent}
+.s-nav li a[aria-current]{color:var(--text);border-bottom-color:var(--ocean)}
+@media (hover:hover){.s-nav li a:hover{color:var(--text)}}
+.s-nav .sp{flex:1}
+.s-nav .ext{display:flex;gap:var(--s5);font-size:.875rem}
+.s-nav .ext a{color:var(--text-2);text-decoration:none}
+@media (hover:hover){.s-nav .ext a:hover{color:var(--text)}}
+.s-nav .menu{display:none}
+@container (max-width:760px){.s-nav ul,.s-nav .ext{display:none}.s-nav .menu{display:inline-flex}}
+.s-foot{padding:24px;font-size:.75rem;line-height:1.125rem;color:var(--text-2);display:grid;gap:4px;border-top:1px solid var(--border)}
+
+/* HOME */
+.hero{padding:var(--s7) 24px var(--s6);display:grid;gap:var(--s5);max-width:980px;margin:0 auto}
+.hero .sub{color:var(--text-2);font-size:.9375rem}
+.hero-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:var(--s4)}
+.samples{display:flex;align-items:center;gap:var(--s3);font-size:.8125rem;color:var(--text-2)}
+.samples .dots{display:flex;gap:8px}
+.samples .well{width:36px;height:36px;aspect-ratio:auto;border-radius:50%;cursor:pointer;box-shadow:0 0 0 1px var(--ws-border)}
+.samples .well[aria-current="true"]{box-shadow:0 0 0 2px var(--ws-bg),0 0 0 4px var(--ws-ocean)}
+@media (pointer:coarse){.samples .well{width:44px;height:44px}}
+.home-body{padding:var(--s8) 24px var(--s7);display:grid;gap:var(--s7);max-width:980px;margin:0 auto}
+.cases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5)}
+@container (max-width:640px){.cases{grid-template-columns:minmax(0,1fr)}}
+.cases figure{margin:0;display:grid;gap:10px;align-content:start}
+.cases .well{border-radius:var(--r-card)}
+.cases figcaption{font-size:.875rem;line-height:1.375rem;color:var(--text-2)} .cases figcaption b{color:var(--text);font-weight:500}
+.summary{display:grid;gap:var(--s3);max-width:62ch;font-size:1.0625rem;line-height:1.75rem}
+.notes{margin:0;padding:0;list-style:none;display:grid;gap:2px;font-size:.75rem;line-height:1.125rem;color:var(--text-2);max-width:62ch}
+.notes li{display:grid;grid-template-columns:14px minmax(0,1fr)}
+.notes sup{color:var(--ocean);vertical-align:baseline}
+
+/* TRY IT */
+.app{display:grid;grid-template-columns:minmax(0,1fr) 300px;min-height:600px}
+@container (max-width:880px){.app{grid-template-columns:minmax(0,1fr)}}
+.stage{padding:20px;display:grid;gap:12px;align-content:start;min-width:0}
+.under{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px}
+.film{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.film .well{border-radius:var(--r-ctl);cursor:pointer}
+.film .well[aria-current="true"]{box-shadow:0 0 0 2px var(--ws-bg),0 0 0 4px var(--ws-ocean)}
+.film .up{border:1px dashed var(--ws-muted);border-radius:var(--r-ctl);display:grid;place-items:center;text-align:center;font-size:.75rem;color:var(--ws-text-2);aspect-ratio:4/3;cursor:pointer;background:transparent;font-family:inherit;padding:4px}
+.quad{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.quad .wcap{left:10px;top:10px}
+.insp{border-left:1px solid var(--ws-border);padding:20px 20px 24px;display:grid;gap:24px;align-content:start}
+@container (max-width:880px){.insp{border-left:0;border-top:1px solid var(--ws-border)}}
+.insp .count{font-size:1.0625rem;font-weight:500;font-variant-numeric:tabular-nums}
+.insp .count small{display:block;font-size:.8125rem;font-weight:400;color:var(--ws-text-2);margin-top:2px}
+.legend{display:grid;margin:0;padding:0;list-style:none}
+.legend button{font:inherit;width:100%;display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:12px;align-items:center;min-height:36px;padding:0 4px;border:0;border-radius:var(--r-tag);background:transparent;color:var(--text);font-size:.875rem;cursor:pointer;text-align:left;transition:background-color var(--d-micro) ease,opacity var(--d-micro) ease}
+.legend button i{width:10px;height:10px;border-radius:50%}
+.legend button span:last-child{color:var(--text-2);font-variant-numeric:tabular-nums}
+.legend button[aria-pressed="false"]{opacity:.45}
+.legend button[aria-pressed="false"] i{background:transparent!important;box-shadow:inset 0 0 0 1.5px var(--text-2)}
+.legend button[aria-pressed="false"] span:nth-child(2){text-decoration:line-through;text-decoration-color:var(--text-2)}
+.legend li.more{display:none}
+.legend.all li.more{display:block}
+@media (hover:hover){.legend button:hover{background:var(--subtle)}}
+@media (pointer:coarse){.legend button{min-height:44px}}
+.inst{max-height:220px;overflow:auto}
+.inst table{font-size:.8125rem}
+.inst td{padding:6px 8px 6px 0;border-color:var(--border)}
+.inst tr{cursor:pointer}
+.inst tr.hl td{background:var(--subtle)}
+.inst td:first-child{display:flex;gap:8px;align-items:center}
+.inst td i{width:8px;height:8px;border-radius:50%;flex:none}
+.dl{display:grid;gap:6px;font-size:.875rem}
+.dl .row{gap:4px 14px}
+.drop{position:absolute;inset:0;z-index:40;display:none;place-items:center;background:rgb(11 21 22 / .78);color:var(--ws-text);font-size:.9375rem;font-weight:500;
+  box-shadow:inset 0 0 0 2px var(--ws-ocean);border-radius:inherit;opacity:0;transition:opacity 150ms var(--ease-out),display 150ms allow-discrete}
+.drop.on{display:grid;opacity:1}
+@starting-style{.drop.on{opacity:0}}
+
+/* LAB (internal) */
+.labbar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:12px 20px;border-bottom:1px solid var(--ws-border)}
+.vchip{display:inline-flex;align-items:center;gap:6px;font-size:.8125rem;font-weight:500;min-height:32px;padding:0 6px 0 10px;border-radius:var(--r-ctl);background:var(--ws-subtle)}
+.vchip.ref{padding-right:10px}
+.vchip button{font:inherit;border:0;background:none;color:var(--ws-text-2);cursor:pointer;padding:0 4px;line-height:1;min-height:28px}
+.addv{position:relative}
+.addv summary{list-style:none;cursor:pointer}
+.addv summary::-webkit-details-marker{display:none}
+.menu-pop{position:absolute;top:calc(100% + 6px);left:0;z-index:30;width:290px;background:var(--ws-surface);border:1px solid var(--ws-border);border-radius:var(--r-card);box-shadow:var(--pop-shadow);padding:6px;display:grid;gap:2px;
+  transform-origin:top left;transition:opacity 150ms var(--ease-out),transform 150ms var(--ease-out)}
+@starting-style{details[open] > .menu-pop{opacity:0;transform:scale(.97)}}
+@media (prefers-reduced-motion: reduce){@starting-style{details[open] > .menu-pop{transform:none}}}
+.menu-pop h5{margin:8px 8px 2px;font-size:.75rem;font-weight:500;color:var(--ws-text-2)}
+.menu-pop button{font:inherit;text-align:left;border:0;background:transparent;color:var(--ws-text);padding:8px;border-radius:var(--r-tag);cursor:pointer;display:grid;gap:1px;font-size:.875rem}
+.menu-pop button small{color:var(--ws-text-2);font-size:.75rem}
+.menu-pop button:disabled{color:var(--ws-muted);cursor:not-allowed}
+.menu-pop button:disabled small{color:var(--ws-muted)}
+@media (hover:hover){.menu-pop button:not(:disabled):hover{background:var(--ws-subtle)}}
+.labstage{padding:20px;display:grid;gap:14px}
+.labgrid{display:grid;gap:8px;grid-template-columns:repeat(var(--n,2),minmax(0,1fr))}
+@container (max-width:640px){.labgrid{grid-template-columns:minmax(0,1fr)}}
+.labgrid .wcap{left:10px;top:10px}
+.labmain{max-width:860px;width:100%;justify-self:center}
+.dlegend{display:flex;flex-wrap:wrap;gap:16px;font-size:.8125rem;color:var(--ws-text-2)}
+.dlegend span{display:inline-flex;gap:6px;align-items:center}
+.dlegend i{width:16px;height:10px;border-radius:2px;flex:none}
+.ltable thead tr:last-child th{border-bottom-color:var(--ws-text-2)}
+.ltable th.grp{border-bottom-color:var(--ws-text-2)}
+.ltable tr.pend td{color:var(--ws-text-2)}
+
+/* RESULTS */
+.res{display:grid;grid-template-columns:150px minmax(0,1fr) 190px;gap:var(--s6) var(--s7);padding:var(--s7) 24px var(--s8);align-items:start}
+@container (max-width:980px){.res{grid-template-columns:150px minmax(0,1fr)}.res .mnote{grid-column:2}}
+@container (max-width:700px){.res{grid-template-columns:minmax(0,1fr)}.res .toc{display:none}.res .mnote{grid-column:1}}
+.toc{position:sticky;top:12px;font-size:.875rem;display:grid;gap:2px}
+.toc a{text-decoration:none;color:var(--text-2);padding:4px 0}
+.toc a[aria-current]{color:var(--text);font-weight:500}
+.rsec{grid-column:2;display:grid;gap:var(--s4);min-width:0}
+@container (max-width:700px){.rsec{grid-column:1}}
+.rsec + .mnote{margin-top:6px}
+.mnote{grid-column:3;font-size:.8125rem;line-height:1.25rem;color:var(--text-2);display:grid;gap:4px;padding-top:6px}
+.mnote b{color:var(--text);font-weight:500}
+.chart text{font-family:var(--font-sans);font-size:11px;fill:var(--text-2)}
+.chart .lab{font-size:12.5px;fill:var(--text)}
+.chart .gridl{stroke:var(--border)} .chart .axis{stroke:var(--muted)}
+tr.base td{font-weight:500}
+tr.dropped td{color:var(--text-2)}
+
+/* ABOUT */
+.about{max-width:720px;margin:0 auto;padding:var(--s8) 24px var(--s8);display:grid;gap:var(--s7)}
+.about header{display:grid;gap:var(--s3)}
+.about .kicker{font-size:.875rem;color:var(--text-2)}
+.about .byline{font-size:.9375rem;line-height:1.5rem}
+.about .byline span{display:block;color:var(--text-2)}
+.about section{display:grid;gap:var(--s3)}
+.about p{line-height:1.6875rem}
+.archfig svg{display:block;width:100%;min-width:540px}
+.archfig{overflow-x:auto}
+.archfig text{font-family:var(--font-sans);font-size:12.5px;fill:var(--text)}
+.archfig .sub{font-size:11px;fill:var(--text-2)}
+pre.bib{margin:0;padding:var(--s4);background:var(--subtle);border-radius:var(--r-ctl);font-size:.8125rem;line-height:1.1875rem;overflow-x:auto;font-family:var(--font-mono)}
+
+/* later + phone */
+.later{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:var(--s5)}
+.later .pad{padding:20px;display:grid;gap:12px}
+.phone-wrap{display:flex;flex-wrap:wrap;gap:var(--s7);align-items:flex-start}
+.phone{width:min(100%,360px);border:1px solid var(--border);border-radius:32px;padding:10px;background:var(--subtle)}
+.phone .screen{border-radius:24px;overflow:hidden;position:relative;height:680px;display:flex;flex-direction:column;container-type:inline-size}
+.sheet{position:absolute;inset:auto 0 0;background:var(--ws-surface);border-top:1px solid var(--ws-border);border-radius:16px 16px 0 0;padding:8px 18px 20px;display:grid;gap:14px}
+.sheet .grab{width:36px;height:4px;border-radius:2px;background:var(--ws-muted);justify-self:center}
+.sheet .utabs{gap:var(--s5)}
+pre.code{margin:0;padding:var(--s4) var(--s5);background:var(--subtle);border-radius:var(--r-card);overflow-x:auto;font-family:var(--font-mono);font-size:.8125rem;line-height:1.1875rem}
+.qlist{display:grid;gap:var(--s3);margin:0;padding:0 0 0 1.2em;font-size:.9375rem;max-width:70ch}
+.test{counter-reset:q;margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:var(--s4) var(--s6)}
+.test li{counter-increment:q;display:grid;grid-template-columns:28px minmax(0,1fr);font-size:.9375rem;line-height:1.5rem}
+.test li::before{content:counter(q);color:var(--ocean);font-weight:600;font-variant-numeric:tabular-nums}
+.test li span{color:var(--text-2);display:block;font-size:.875rem}
+</style>
+
+<div class="doc">
+<nav class="rail" aria-label="Sections">
+  <ol>
+    <li><a href="#direction">Direction</a></li>
+    <li><a href="#principles">Grounded in perception</a></li>
+    <li><a href="#tokens">Type and colour</a></li>
+    <li><a href="#components">Components</a></li>
+    <li><a href="#wireframes">Wireframes</a></li>
+    <li class="sub"><a href="#wf-home">Home</a></li>
+    <li class="sub"><a href="#wf-try">Try it</a></li>
+    <li class="sub"><a href="#wf-results">Results</a></li>
+    <li class="sub"><a href="#wf-about">About</a></li>
+    <li class="sub"><a href="#wf-later">Explore</a></li>
+    <li class="sub"><a href="#wf-phone">Phone</a></li>
+    <li class="sub"><a href="#wf-lab">Lab (internal)</a></li>
+    <li><a href="#motion">Motion</a></li>
+    <li><a href="#build">Build mapping</a></li>
+    <li><a href="#open">Open questions</a></li>
+  </ol>
+  <div class="theme">
+    Reading theme
+    <div class="utabs" id="themeSeg" role="group" aria-label="Preview theme" style="gap:14px">
+      <button type="button" data-t="" aria-pressed="true">System</button>
+      <button type="button" data-t="light" aria-pressed="false">Light</button>
+      <button type="button" data-t="dark" aria-pressed="false">Dark</button>
+    </div>
+    <span>Try it stays dark.</span>
+  </div>
+</nav>
+
+<main>
+<header class="masthead">
+  <h1 class="h1">SeaBed Lens</h1>
+  <p class="lead">Design system and wireframes, version 4. A calm, precise window into underwater computer vision research: the organisms, the model, the result and the research carry the page, and the interface stays out of the way.</p>
+  <ul class="changes">
+    <li><b>Quieter type.</b> Inter for the interface, Source Serif 4 for page titles and claim headlines only, JetBrains Mono only for IDs and code. Ordinary labels like Source, Test and Dataset are no longer mono.</li>
+    <li><b>Ocean teal leads.</b> Teal is the brand and every primary action. Amber is now rare: the running indicator and nothing decorative.</li>
+    <li><b>Fewer layers.</b> Page, content surface and emphasis. Tables, the inspector, About and the principles sit on the page with hairlines and whitespace, not inside cards. No default shadows. The hero gradient is gone.</li>
+    <li><b>Public navigation:</b> Explore, Try it, Results, About, with GitHub and Thesis on the right. Benchmarks moved into Results; the Component Lab is internal, reached from Try it.</li>
+    <li><b>Home is image first:</b> a short serif line, then the comparison, then one action and the sample images.</li>
+    <li><b>Controls recede.</b> Underline tabs instead of segmented pills, text buttons for secondary actions, the image cleared of floating toolbars.</li>
+  </ul>
+</header>
+
+<!-- ============ DIRECTION ============ -->
+<section class="block" id="direction">
+  <header>
+    <h2 class="h2 serif">Quiet Scientific</h2>
+    <p class="lede">Somewhere between a scientific publication, modern software and a field instrument. Visitors should leave thinking about the organisms, the model, the result and the research, and almost never about the UI. Six questions decide whether a component or page is ready.</p>
+  </header>
+  <ol class="test">
+    <li><div>Can I remove something without losing information or function?<span>If yes, remove it.</span></div></li>
+    <li><div>Does this need a card?<span>If whitespace or type can group it, it doesn't.</span></div></li>
+    <li><div>Is this label necessary?<span>If the context already says it, drop it.</span></div></li>
+    <li><div>Does it look like a generic AI dashboard?<span>If yes, simplify it.</span></div></li>
+    <li><div>Does the interface compete with the imagery?<span>If yes, simplify it.</span></div></li>
+    <li><div>Does the page still work with all decoration removed?<span>If yes, the hierarchy is sound.</span></div></li>
+  </ol>
+  <div class="cols">
+    <div><h3 class="h4">Avoid: generic AI</h3><p class="small t2">Purple-blue gradients, glowing borders, glass panels, gradient text, sparkle icons, futuristic copy.</p></div>
+    <div><h3 class="h4">Avoid: SaaS dashboard</h3><p class="small t2">Card grids, giant metric tiles, badge clutter, nested cards, chrome around simple information.</p></div>
+    <div><h3 class="h4">Avoid: developer tool</h3><p class="small t2">Mono everywhere, terminal surfaces, tiny labels, more technical IDs than the reader needs.</p></div>
+    <div><h3 class="h4">Avoid: dated academic site</h3><p class="small t2">Dense paragraphs, Times-like type, paper clutter, footnotes on every sentence.</p></div>
+  </div>
+</section>
+
+<!-- ============ PRINCIPLES ============ -->
+<section class="block" id="principles">
+  <header>
+    <h2 class="h2 serif">Grounded in how people see</h2>
+    <p class="lede">The visual layer changed in v4; these findings did not. Each still produces a rule, and if a later choice conflicts with one, the finding wins.</p>
+  </header>
+  <div class="tbl"><table class="pr">
+    <thead><tr><th>Finding</th><th>Rule on SeaBed Lens</th></tr></thead>
+    <tbody>
+      <tr><td><b>Chromatic adaptation</b><span>The eye adapts to the surround, so a tinted frame shifts how an image's colours look (the reason for ISO 3664's neutral surround).</span></td><td>The well behind every image is neutral grey <code>#17191B</code>. Teal chrome stays one step further out, and the teal action colour never appears inside the image.</td></tr>
+      <tr><td><b>Positive polarity</b><span>Dark text on light is read more accurately (Piepenbrock et al., 2013).</span></td><td>Results, Explore and About are light by default. Try it and the Lab are dark, like a photo editor, because there the image is the content.</td></tr>
+      <tr><td><b>Halation</b><span>Pure white on black blurs for readers with astigmatism.</span></td><td>Dark-surface text is <code>#E9EFED</code>, never <code>#FFF</code>; light-surface text is <code>#17211F</code>, never black.</td></tr>
+      <tr><td><b>Position is decoded best</b><span>Cleveland &amp; McGill (1984).</span></td><td>Dot plots on one shared axis with direct labels. No pie, radar, 3D or truncated bars.</td></tr>
+      <tr><td><b>Pre-attentive pop-out</b><span>Treisman &amp; Gelade (1980).</span></td><td>Inside the image, hue means class and nothing else. Selection dims everything else. Teal marks the one primary action per view.</td></tr>
+      <tr><td><b>Change blindness</b><span>Simons &amp; Rensink (2005).</span></td><td>Compare in one place: swipe on Home, hold-to-flicker ground truth in Try it, swipe and difference views in the Lab.</td></tr>
+      <tr><td><b>Working memory, about 4 chunks</b><span>Cowan (2001).</span></td><td>The inspector shows the count, threshold and top three classes; everything else expands on request.</td></tr>
+      <tr><td><b>Fitts's law</b><span>Distance and size set the time to hit a target.</span></td><td>32px targets with a pointer, 44px on touch, controls low on phones.</td></tr>
+      <tr><td><b>Response-time limits</b><span>0.1 s, 1 s, 10 s (Miller, 1968; Card et al., 1991).</span></td><td>Filters re-render in under 0.1 s without animation. Runs keep the old result dimmed and show the step and elapsed time.</td></tr>
+      <tr><td><b>Peripheral motion captures attention</b><span>Abrams &amp; Christ (2003).</span></td><td>Nothing moves unless the visitor caused it. Motion only reports a state change.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ TOKENS ============ -->
+<section class="block" id="tokens">
+  <header>
+    <h2 class="h2 serif">Type and colour</h2>
+    <p class="lede">A small palette. Teal is brand and action, amber is attention, green, red and blue each mean one thing. Nothing is coloured for decoration.</p>
+  </header>
+
+  <div class="scale" id="typescale">
+    <div><small>Display · Serif 48/56</small><span class="display">Explore underwater life.</span></div>
+    <div><small>H1 · Serif 36/44</small><span class="h1">SeaBed-Net</span></div>
+    <div><small>H2 · 28/36</small><span class="h2 serif">Masks trail boxes on small objects.</span></div>
+    <div><small>H3 · 21/28</small><span class="h3">Where it works, and where it doesn't</span></div>
+    <div><small>H4 · 17/24</small><span class="h4">Detections</span></div>
+    <div><small>Body · 16/25</small><span>Detection and segmentation are separate heads, so the box and mask counts for one image can differ.</span></div>
+    <div><small>Small · 14/20</small><span class="small">Boxes and masks come from separate heads.</span></div>
+    <div><small>Caption · 12/17</small><span class="cap t2">Figure 2. Mean of 3 seeds.</span></div>
+    <div><small>Data · Inter tabular 14/20</small><span class="small num">0.6453 &nbsp; 0.8428 &nbsp; 0.616</span></div>
+    <div><small>Code · Mono 13/19</small><code>ab_vitl_acc_s3</code></div>
+  </div>
+
+  <div style="display:grid;gap:var(--s4)">
+    <h3 class="h4">Light</h3>
+    <div class="swatches" id="swRead"></div>
+  </div>
+  <div class="ws-panel" style="display:grid;gap:var(--s4)">
+    <h3 class="h4">Dark workspace, fixed in both themes</h3>
+    <div class="swatches" id="swWs"></div>
+  </div>
+
+  <div class="cols">
+    <div>
+      <h3 class="h4">Contrast rules the palette needs</h3>
+      <ul class="rules">
+        <li><b>Secondary</b> <code>#66716D</code> is the lightest text: 4.75:1 on the page. Not on Subtle, where it drops to 4.45.</li>
+        <li><b>Muted</b> <code>#8A9591</code> never carries text (2.9:1). It is the boundary for inputs and secondary buttons on white (3.09:1), placeholders and disabled states.</li>
+        <li><b>Amber</b> never carries text on light (2.07:1). Use it as a fill under dark text (7.96:1) or as a dot beside a label.</li>
+        <li><b>Dark Muted</b> <code>#74827E</code> is for disabled states only; on the workspace surface it falls to 4.3:1.</li>
+        <li><b>Info blue</b> is 4.17:1 on white, so it pairs with an icon or sits at 18px and up.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="h4">Shape and space</h3>
+      <ul class="rules">
+        <li><b>Radius:</b> tags 5, controls and inputs 7, cards 10, image wells 12. No pill-shaped controls.</li>
+        <li><b>Borders:</b> 1px <code>#D9DEDC</code> light, <code>#263536</code> dark, for structure only. No nested bordered boxes.</li>
+        <li><b>Shadow:</b> none by default. Popovers, menus, tooltips and the swipe handle only.</li>
+        <li><b>Spacing:</b> 4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96. Sections 64–96, related content 16–24, control groups 8–12.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="cols">
+    <div>
+      <h3 class="h4">Overlay palette, 20 classes</h3>
+      <p class="small t2">High-luminance hues kept away from the water's blue-green, assigned by class frequency. Masks fill at 30% with a 1.5px outline and a dark halo; every mask can show a text label because 20 hues cannot all be told apart. Labels show for the top three and for whatever is hovered. A colour-blind preset sits under More options.</p>
+    </div>
+    <div class="classgrid" id="classgrid"></div>
+  </div>
+</section>
+
+<!-- ============ COMPONENTS ============ -->
+<section class="block" id="components">
+  <header>
+    <h2 class="h2 serif">Components</h2>
+    <p class="lede">Built on shadcn, restyled until it no longer looks like shadcn. Each component says what it does, whether it is active and whether it can be used, and nothing more.</p>
+  </header>
+  <div class="cols">
+    <div>
+      <h3 class="h4">Buttons, three levels</h3>
+      <div class="row"><button class="btn btn-primary" type="button">Try your own image</button><button class="btn btn-secondary" type="button">Download CSV</button><a class="btn btn-text" href="#wf-results">Read the results <span class="arr" aria-hidden="true">→</span></a></div>
+      <p class="small t2">Solid teal for the one primary action per view. Secondary is white with a Muted border. Everything else is a text button.</p>
+    </div>
+    <div>
+      <h3 class="h4">Input</h3>
+      <div class="field"><label for="demoSearch">Find a class</label><input class="input" id="demoSearch" type="search" placeholder="Starfish, sea cucumber…"></div>
+      <p class="small t2">Focus is a teal border thickened to 2px. No glow.</p>
+    </div>
+    <div>
+      <h3 class="h4">Tabs</h3>
+      <div class="utabs" role="tablist" data-tabs="demo"><button type="button" role="tab" aria-selected="true" data-p="a">Chart</button><button type="button" role="tab" aria-selected="false" data-p="b">Table</button><button type="button" role="tab" aria-selected="false" data-p="c">Sources</button></div>
+      <p class="small t2">Text with a 2px teal underline on the active tab. Used for figure views, the inspector's view switch and the Lab's compare modes.</p>
+    </div>
+    <div>
+      <h3 class="h4">Badges, for status only</h3>
+      <div class="row"><span class="badge ok"><i></i>Ready</span><span class="badge run"><i></i>Processing</span><span class="badge err"><i></i>Failed</span><span class="badge">Dataset</span></div>
+      <p class="small t2">Each carries a word, never colour alone. Splits like test and val are plain text in their column, not badges.</p>
+    </div>
+    <div>
+      <h3 class="h4">Footnote</h3>
+      <p>SeaBed-Net reaches 0.645 box AP<span class="fn"><button type="button" aria-label="Source 1" aria-describedby="fnA">1</button><span class="card" role="tooltip" id="fnA"><b>Mean of 3 seeds, JODD test split</b><span class="line">Runs <code>ab_vitl_acc_s3</code>, <code>_seed1</code>, <code>_seed2</code></span></span></span>.</p>
+      <p class="small t2">A small teal numeral. Provenance opens on hover, focus or tap.</p>
+    </div>
+    <div>
+      <h3 class="h4">Source line</h3>
+      <div class="src"><span>Source: <code>ab_vitl_acc_s3</code> · 3 seeds · JODD test split</span><a href="#wf-results">Sources &amp; data →</a></div>
+      <p class="small t2">One sentence under each table or figure. Run IDs are the only mono.</p>
+    </div>
+    <div>
+      <h3 class="h4">Nulls and pending</h3>
+      <div class="row"><span class="badge null">No detectable difference</span><span class="small t2">Pending ablation</span></div>
+      <p class="small t2">A null is a result and gets words, never a blank cell. Pending variants stay visible and disabled.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WIREFRAMES ============ -->
+<section class="block" id="wireframes">
+  <header>
+    <h2 class="h2 serif">Wireframes</h2>
+    <p class="lede">Interactive. The seabed scenes are painted placeholders until the JODD licence is cleared. Headline numbers are the real B0 figures; anything not yet exported is dashed.</p>
+  </header>
+
+  <!-- HOME -->
+  <div class="wf-h" id="wf-home"><h3 class="h3">Home</h3><span>/</span></div>
+  <div class="frame">
+    <div class="chrome"><i></i><i></i><i></i><span class="url">seabed-lens</span></div>
+    <div class="ws">
+      <nav class="s-nav" aria-label="Site (wireframe)">
+        <a class="wordmark" href="#wf-home"><svg width="18" height="18" viewBox="0 0 22 22" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="9.25" stroke="currentColor" stroke-width="1.5"/><circle cx="11" cy="11" r="4.5" stroke="currentColor" stroke-width="1.5"/><circle cx="12.6" cy="9.4" r="1.4" fill="var(--ws-amber)"/></svg>SeaBed Lens</a>
+        <ul><li><a href="#wf-later">Explore</a></li><li><a href="#wf-try">Try it</a></li><li><a href="#wf-results">Results</a></li><li><a href="#wf-about">About</a></li></ul>
+        <span class="sp"></span><div class="ext"><a href="#wf-home">GitHub</a><a href="#wf-about">Thesis</a></div><button class="btn btn-text btn-sm menu" type="button">Menu</button>
+      </nav>
+      <div class="hero">
+        <div style="display:grid;gap:8px">
+          <h1 class="display">Explore underwater life with SeaBed&#8209;Net.</h1>
+          <p class="sub">20 classes · detection and segmentation · deep-sea ROV imagery</p>
+        </div>
+        <div class="well swipe" data-scene="a" data-show="both" id="heroWell">
+          <span class="wcap side-l">Image</span><span class="wcap side-r">Model output</span>
+          <input type="range" min="0" max="100" value="45" id="heroRange" aria-label="Drag to compare the image with the model output">
+          <span class="handle" id="heroHandle"></span>
+        </div>
+        <div class="hero-foot">
+          <a class="btn btn-primary" href="#wf-try">Try your own image</a>
+          <div class="samples"><span>Sample images</span><div class="dots" id="heroStrip" role="group" aria-label="Choose a sample image"></div></div>
+        </div>
+        <p class="cap" style="color:var(--ws-text-2)" id="heroCap">Full model (B0) · threshold 0.30 · painted placeholder until the JODD licence is cleared</p>
+      </div>
+    </div>
+    <div class="home-body">
+      <div style="display:grid;gap:var(--s4)">
+        <h2 class="h3">Where it works, and where it doesn't</h2>
+        <div class="cases">
+          <figure><div class="well" data-scene="b" data-show="masks"></div><figcaption><b>Clear.</b> One large starfish under good light.</figcaption></figure>
+          <figure><div class="well" data-scene="c" data-show="masks"></div><figcaption><b>Typical.</b> Three animals, partly in sediment.</figcaption></figure>
+          <figure><div class="well" data-scene="e" data-show="masks"></div><figcaption><b>Fails.</b> A low-contrast fish found with low confidence. The starfish gets a box but no mask.</figcaption></figure>
+        </div>
+      </div>
+      <div style="display:grid;gap:var(--s4)">
+        <div class="summary">
+          <p>SeaBed-Net finds and outlines 20 kinds of deep-sea organisms in ROV images. On the held-out JODD test split it reaches 0.645 box AP and 0.638 mask AP<span class="fn"><button type="button" aria-label="Source 1" aria-describedby="fnH1">1</button><span class="card" role="tooltip" id="fnH1"><b>Mean of 3 seeds, JODD test split</b><span class="line">Runs <code>ab_vitl_acc_s3</code>, <code>_seed1</code>, <code>_seed2</code></span></span></span>, and on RUOD it scores 65.2 box AP against 62.0 for UDINO, with about five times the parameters<span class="fn"><button type="button" aria-label="Source 2" aria-describedby="fnH2">2</button><span class="card" role="tooltip" id="fnH2"><b>RUOD, UDINO protocol, one run</b><span class="line">Ours 65.22 box AP, 352 M parameters</span><span class="line">UDINO 62.0 box AP, 69.5 M</span></span></span>.</p>
+        </div>
+        <ol class="notes"><li><sup>1</sup><span>Mean of 3 seeds, JODD test split.</span></li><li><sup>2</sup><span>One run, official RUOD test split, UDINO's protocol.</span></li></ol>
+        <div class="row" style="gap:var(--s5)"><a class="btn btn-text" href="#wf-results">Read the results <span class="arr" aria-hidden="true">→</span></a><a class="btn btn-text" href="#wf-about">About the thesis <span class="arr" aria-hidden="true">→</span></a></div>
+      </div>
+    </div>
+    <footer class="s-foot"><span>Images: J-EDI Organism Detection Dataset (JODD), JAMSTEC J-EDI. Nishio &amp; Kawae, <i>Data in Brief</i> 65, 112462 (2026).</span><span>Masks: JODD-Seg (SAM 3 pseudo-masks reviewed by three people). Backbones: ConvNeXt-T, DINOv2.</span></footer>
+  </div>
+  <ul class="why">
+    <li><b>The image takes most of the hero.</b>One serif line and one subline, then the comparison. No statistics tiles, no marketing copy.</li>
+    <li><b>Sample images are small circles.</b>They show what each sample looks like without competing with the main image.</li>
+    <li><b>Numbers live in a sentence.</b>Footnotes carry the provenance; the paper title block moved to About.</li>
+    <li><b>Results and About are text links.</b>One solid button per view, and it is the one that runs the model.</li>
+  </ul>
+
+  <!-- TRY IT -->
+  <div class="wf-h" id="wf-try"><h3 class="h3">Try it</h3><span>/try</span></div>
+  <div class="frame ws" id="tryFrame" style="position:relative">
+    <div class="chrome"><i></i><i></i><i></i><span class="url">seabed-lens / try</span></div>
+    <nav class="s-nav" aria-label="Site (wireframe)">
+      <a class="wordmark" href="#wf-home">SeaBed Lens</a>
+      <ul><li><a href="#wf-later">Explore</a></li><li><a href="#wf-try" aria-current="page">Try it</a></li><li><a href="#wf-results">Results</a></li><li><a href="#wf-about">About</a></li></ul>
+      <span class="sp"></span><div class="ext"><a href="#wf-home">GitHub</a><a href="#wf-about">Thesis</a></div><button class="btn btn-text btn-sm menu" type="button">Menu</button>
+    </nav>
+    <div class="app">
+      <div class="stage">
+        <div id="tryMain">
+          <div class="well" data-scene="a" data-show="both" data-live id="tryWell">
+            <div class="status" role="status"><i></i><span id="statusTxt">Running on CPU · 0.0 s · usually about 10 s</span></div>
+          </div>
+        </div>
+        <div class="quad" id="tryQuad" hidden>
+          <div class="well" data-scene="a" data-show="none"><span class="wcap">Image</span></div>
+          <div class="well" data-scene="a" data-show="gt"><span class="wcap">Ground truth</span></div>
+          <div class="well" data-scene="a" data-show="boxes" data-live><span class="wcap">Detection</span></div>
+          <div class="well" data-scene="a" data-show="masks" data-live><span class="wcap">Segmentation</span></div>
+        </div>
+        <div class="under">
+          <span class="hint" id="tryCap">Sample · ground truth available · 640×480</span>
+          <div class="row" style="gap:4px 16px">
+            <button class="btn btn-text btn-sm" type="button" id="holdGT">Hold to show ground truth</button>
+            <button class="btn btn-text btn-sm" type="button" id="figView" aria-pressed="false">Thesis figure layout</button>
+          </div>
+        </div>
+        <div class="film" id="film" role="group" aria-label="Sample images"></div>
+        <p class="hint">Pick a sample, or drop an image anywhere on this page. Uploads run on the full model and are deleted after <span class="ph">24 h</span>.</p>
+      </div>
+      <aside class="insp" aria-label="Results and options">
+        <div class="utabs" role="tablist" aria-label="Show" id="t-show">
+          <button type="button" role="tab" aria-selected="false" data-v="boxes">Detection</button><button type="button" role="tab" aria-selected="false" data-v="masks">Segmentation</button><button type="button" role="tab" aria-selected="true" data-v="both">Both</button>
+        </div>
+        <div class="count"><span id="sumLine">8 boxes · 9 masks</span><small>Boxes and masks come from separate heads, so the counts can differ.</small></div>
+        <div class="ctl"><label for="t-thr">Score threshold <output id="t-thr-o">0.30</output></label>
+          <input type="range" id="t-thr" min="0.05" max="0.9" step="0.05" value="0.3"></div>
+        <div style="display:grid;gap:4px">
+          <ul class="legend" id="legend"></ul>
+          <button class="btn btn-text btn-sm" type="button" id="legendMore" style="justify-self:start" aria-expanded="false">Show all classes</button>
+        </div>
+        <div style="display:grid;gap:0;border-top:1px solid var(--ws-border);padding-top:8px">
+          <details class="more"><summary>Instances <span class="hint" id="instN"></span></summary><div><div class="inst"><table><tbody id="instBody"></tbody></table></div></div></details>
+          <details class="more"><summary>More options</summary><div>
+            <div class="ctl"><label for="t-op">Mask opacity <output id="t-op-o">0.30</output></label><input type="range" id="t-op" min="0.1" max="0.9" step="0.05" value="0.3"></div>
+            <label class="switch"><input type="checkbox" id="t-tta"><span>Flip test-time augmentation<br><span class="hint">Runs again with two passes, about 2× the time</span></span></label>
+            <label class="switch"><input type="checkbox" id="t-cb"><span>Colour-blind palette</span></label>
+          </div></details>
+        </div>
+        <div class="dl">
+          <span class="hint">Download</span>
+          <div class="row"><a class="btn btn-text btn-sm" href="#wf-try">Overlay PNG</a><a class="btn btn-text btn-sm" href="#wf-try">COCO JSON</a><a class="btn btn-text btn-sm" href="#wf-try">CSV</a><a class="btn btn-text btn-sm" href="#wf-try">API call</a></div>
+        </div>
+        <a class="btn btn-text btn-sm" href="#wf-lab" style="justify-self:start">Compare with other model variants <span class="arr" aria-hidden="true">→</span></a>
+      </aside>
+    </div>
+    <div class="drop" id="dropZone" aria-hidden="true">Drop to run on the full model</div>
+  </div>
+  <ul class="why">
+    <li><b>The canvas is clear.</b>View tabs, ground truth and the figure layout moved off the image into the inspector and the line beneath it.</li>
+    <li><b>The inspector is a column of text, not a stack of cards.</b>Count, threshold, the top three classes, then everything else on request.</li>
+    <li><b>Hover a class or a mask and the other lights up.</b>Gradio AnnotatedImage's link between list and image, kept from v2.</li>
+    <li><b>Turn on Flip TTA to see the wait state.</b>The old result dims, and the status fades in with the step and timer.</li>
+  </ul>
+
+  <!-- RESULTS -->
+  <div class="wf-h" id="wf-results"><h3 class="h3">Results</h3><span>/results · now includes Benchmarks</span></div>
+  <div class="frame">
+    <div class="chrome"><i></i><i></i><i></i><span class="url">seabed-lens / results</span></div>
+    <nav class="s-nav line" aria-label="Site (wireframe)">
+      <a class="wordmark" href="#wf-home">SeaBed Lens</a>
+      <ul><li><a href="#wf-later">Explore</a></li><li><a href="#wf-try">Try it</a></li><li><a href="#wf-results" aria-current="page">Results</a></li><li><a href="#wf-about">About</a></li></ul>
+      <span class="sp"></span><div class="ext"><a href="#wf-home">GitHub</a><a href="#wf-about">Thesis</a></div><button class="btn btn-text btn-sm menu" type="button">Menu</button>
+    </nav>
+    <div class="res">
+      <nav class="toc" aria-label="On this page" style="grid-row:span 7">
+        <a href="#wf-results" aria-current="true">Headline</a><a href="#wf-results">Object size</a><a href="#wf-results">Benchmarks</a><a href="#wf-results">Config changes</a><a href="#wf-results">Per class</a><a href="#wf-results">DAPFT</a>
+      </nav>
+      <div class="rsec">
+        <h2 class="h2 serif">SeaBed-Net reaches 0.645 box AP and 0.638 mask AP on the held-out JODD test split.</h2>
+        <div class="tbl"><table>
+          <thead>
+            <tr><th></th><th class="grp" colspan="5">JODD test · mean of 3 seeds</th><th class="gap"></th><th class="grp" colspan="2">With flip TTA</th></tr>
+            <tr><th></th><th class="n">AP</th><th class="n">AP50</th><th class="n">AP<sub>S</sub></th><th class="n">AP<sub>M</sub></th><th class="n">AP<sub>L</sub></th><th class="gap"></th><th class="n">AP</th><th class="n">AP50</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Box</td><td class="n">0.6453</td><td class="n">0.8428</td><td class="n">0.616</td><td class="n">0.669</td><td class="n">0.677</td><td class="gap"></td><td class="n alt">0.6504</td><td class="n alt">0.8458</td></tr>
+            <tr><td>Mask</td><td class="n">0.6380</td><td class="n">0.8357</td><td class="n">0.544</td><td class="n">0.668</td><td class="n">0.723</td><td class="gap"></td><td class="n alt">0.6439</td><td class="n alt">0.8473</td></tr>
+          </tbody></table></div>
+        <div class="src"><span>Source: <code>ab_vitl_acc_s3</code> · 3 seeds · JODD test split · TTA from <code>tta_flip_test_results.json</code></span><a href="#wf-results">Sources &amp; data →</a></div>
+      </div>
+      <aside class="mnote"><b>Reading ± sd</b>The export adds ± sd over the 3 seeds. Differences under about one sd read as ties.</aside>
+
+      <div class="rsec">
+        <h3 class="h3 serif">Masks trail boxes on small objects and lead on large ones.</h3>
+        <div class="fig" style="display:grid;gap:12px">
+          <div class="utabs" role="tablist" data-tabs="size"><button type="button" role="tab" aria-selected="true" data-p="chart">Chart</button><button type="button" role="tab" aria-selected="false" data-p="table">Table</button><button type="button" role="tab" aria-selected="false" data-p="src">Sources</button></div>
+          <div data-panel="size-chart">
+            <svg class="chart" viewBox="0 0 640 178" width="100%" role="img" aria-label="Dot plot of AP by object size. Small: box 0.616, mask 0.544. Medium: box 0.669, mask 0.668. Large: box 0.677, mask 0.723.">
+              <line class="gridl" x1="120" y1="18" x2="120" y2="148"/><line class="gridl" x1="216" y1="18" x2="216" y2="148"/><line class="gridl" x1="312" y1="18" x2="312" y2="148"/><line class="gridl" x1="408" y1="18" x2="408" y2="148"/><line class="gridl" x1="504" y1="18" x2="504" y2="148"/><line class="gridl" x1="600" y1="18" x2="600" y2="148"/>
+              <line class="axis" x1="120" y1="148" x2="600" y2="148"/>
+              <text x="120" y="166" text-anchor="middle">0.50</text><text x="216" y="166" text-anchor="middle">0.55</text><text x="312" y="166" text-anchor="middle">0.60</text><text x="408" y="166" text-anchor="middle">0.65</text><text x="504" y="166" text-anchor="middle">0.70</text><text x="600" y="166" text-anchor="middle">0.75</text>
+              <text class="lab" x="0" y="46">Small</text><text class="lab" x="0" y="88">Medium</text><text class="lab" x="0" y="130">Large</text>
+              <line x1="204.5" y1="42" x2="342.7" y2="42" stroke="var(--muted)" stroke-width="1.5"/><line x1="459.8" y1="126" x2="548.2" y2="126" stroke="var(--muted)" stroke-width="1.5"/>
+              <circle cx="342.7" cy="42" r="6" fill="var(--ocean)"/><text x="352" y="38">box 0.616</text>
+              <path d="M204.5 35 L211.5 42 L204.5 49 L197.5 42 Z" fill="var(--text)"/><text x="186" y="38" text-anchor="end">mask 0.544</text>
+              <circle cx="444.5" cy="77" r="6" fill="var(--ocean)"/><text x="456" y="81">box 0.669</text>
+              <path d="M442.6 84 L449.6 91 L442.6 98 L435.6 91 Z" fill="var(--text)"/><text x="428" y="95" text-anchor="end">mask 0.668</text>
+              <circle cx="459.8" cy="126" r="6" fill="var(--ocean)"/><text x="448" y="122" text-anchor="end">box 0.677</text>
+              <path d="M548.2 119 L555.2 126 L548.2 133 L541.2 126 Z" fill="var(--text)"/><text x="562" y="122">mask 0.723</text>
+            </svg>
+          </div>
+          <div data-panel="size-table" class="tbl" hidden><table><thead><tr><th>Size</th><th class="n">Box AP</th><th class="n">Mask AP</th><th class="n">Mask − box</th></tr></thead><tbody>
+            <tr><td>Small</td><td class="n">0.616</td><td class="n">0.544</td><td class="n">−0.072</td></tr><tr><td>Medium</td><td class="n">0.669</td><td class="n">0.668</td><td class="n">−0.001</td></tr><tr><td>Large</td><td class="n">0.677</td><td class="n">0.723</td><td class="n">+0.046</td></tr></tbody></table></div>
+          <div data-panel="size-src" class="small t2" hidden>COCO size bins (S &lt; 32², M &lt; 96², L ≥ 96² px), averaged over the three <code>*.test_eval_verified.json</code> files. <a href="#wf-results">Download CSV</a>.</div>
+          <p class="cap t2">Figure 2. Circles are boxes, diamonds are masks. Mean of 3 seeds; the axis starts at 0.50.</p>
+        </div>
+      </div>
+      <aside class="mnote"><b>Why small masks lag</b>A small organism covers few pixels at stride 4, so one pixel of mask error is a large share of its area. <span class="ph">Wording to confirm.</span></aside>
+
+      <div class="rsec">
+        <h3 class="h3 serif">On public benchmarks it leads, using more parameters than most rivals.</h3>
+        <div class="tbl"><table>
+          <thead><tr><th>Benchmark</th><th>Protocol</th><th class="n">SeaBed-Net</th><th class="n">Best published</th><th class="n">Their params</th></tr></thead>
+          <tbody>
+            <tr><td>RUOD box</td><td class="t2">UDINO</td><td class="n"><b>65.22</b></td><td class="n">62.0</td><td class="n alt">69.5 M</td></tr>
+            <tr><td>RUOD box</td><td class="t2">EDB-Net</td><td class="n"><b>62.68</b></td><td class="n">58.3</td><td class="n alt">80.67 M</td></tr>
+            <tr><td>UIIS10K box</td><td class="t2">Official</td><td class="n"><b>49.91</b></td><td class="n">45.8</td><td class="n alt">632 M</td></tr>
+            <tr><td>UIIS10K mask</td><td class="t2">Official</td><td class="n"><b>47.66</b></td><td class="n">44.6</td><td class="n alt">632 M</td></tr>
+          </tbody></table></div>
+        <div class="src"><span>Source: <code>SOTA_COMPARISON_2026-09-22.md</code> · one run each · official test splits · ours 352 M</span><a href="#wf-results">Sources &amp; data →</a></div>
+      </div>
+      <aside class="mnote"><b>One run per benchmark</b>These are single runs, so treat gaps under about 0.03 AP with caution.</aside>
+
+      <div class="rsec">
+        <h3 class="h3 serif">Most single changes made no detectable difference.</h3>
+        <div class="tbl"><table>
+          <thead><tr><th>Change from baseline</th><th>Split</th><th class="n">n</th><th class="n">Δ box AP</th><th class="n">Δ mask AP</th><th>Reading</th></tr></thead>
+          <tbody>
+            <tr class="base"><td>Baseline: B0</td><td>test</td><td class="n">3</td><td class="n">0.6453</td><td class="n">0.6380</td><td></td></tr>
+            <tr><td>ViT-L → ViT-B</td><td>test</td><td class="n ph">?</td><td class="n ph">−0.0xx</td><td class="n ph">−0.0xx</td><td class="ph">from export</td></tr>
+            <tr><td>Mosaic augmentation off</td><td>val</td><td class="n">1</td><td class="n ph">0.0xx</td><td class="n ph">0.0xx</td><td><span class="badge null">No detectable difference</span></td></tr>
+            <tr class="dropped"><td>DAPFT pre-fine-tuning</td><td>val</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td>Dropped (F29, F33, F116, F121)</td></tr>
+          </tbody></table></div>
+        <div class="src"><span>Source: <code>RUNS_2026-09-28_TO_2026-10-09.md</code> · splits as labelled per row</span><a href="#wf-results">Sources &amp; data →</a></div>
+        <p class="hint">Rows show the format only. Real rows come from the export.</p>
+      </div>
+      <aside class="mnote"><b>The 0.03 rule</b>With one seed, differences under 0.03 AP are within run-to-run noise, so they read as "no detectable difference". Explained once, here.</aside>
+    </div>
+  </div>
+  <ul class="why">
+    <li><b>Lead with the finding.</b>Serif sentence headlines, then the evidence. No metric tiles.</li>
+    <li><b>Tables sit on the page.</b>Hairline rows, a dark rule under the header, right-aligned tabular figures, bold only for the winning value.</li>
+    <li><b>TTA is structural, not coloured.</b>Its own column group and header; values in secondary text.</li>
+    <li><b>Benchmarks moved here.</b>Not enough content yet for a page of its own.</li>
+  </ul>
+
+  <!-- ABOUT -->
+  <div class="wf-h" id="wf-about"><h3 class="h3">About</h3><span>/about · also the target of "Thesis"</span></div>
+  <div class="frame">
+    <div class="chrome"><i></i><i></i><i></i><span class="url">seabed-lens / about</span></div>
+    <nav class="s-nav line" aria-label="Site (wireframe)">
+      <a class="wordmark" href="#wf-home">SeaBed Lens</a>
+      <ul><li><a href="#wf-later">Explore</a></li><li><a href="#wf-try">Try it</a></li><li><a href="#wf-results">Results</a></li><li><a href="#wf-about" aria-current="page">About</a></li></ul>
+      <span class="sp"></span><div class="ext"><a href="#wf-home">GitHub</a><a href="#wf-about">Thesis</a></div><button class="btn btn-text btn-sm menu" type="button">Menu</button>
+    </nav>
+    <article class="about">
+      <header>
+        <h1 class="h1">SeaBed-Net</h1>
+        <p class="h3 serif" style="color:var(--text-2)">Multicolor Hybrid CNN-ViT for Dual-Task Underwater Object Detection and Instance Segmentation</p>
+        <p class="byline" style="margin-top:var(--s3)">Rolf Genree L. Garces<span>BS Computer Science · University of the Philippines Tacloban · 2026</span><span>Adviser: John Paul T. Yusiong, PhD</span></p>
+        <div class="row" style="gap:var(--s5);margin-top:var(--s2)"><a class="btn btn-text" href="#wf-about">Paper (PDF) <span class="arr" aria-hidden="true">→</span></a><a class="btn btn-text" href="#wf-about">Code <span class="arr" aria-hidden="true">→</span></a><a class="btn btn-text" href="#wf-later">Dataset <span class="arr" aria-hidden="true">→</span></a></div>
+      </header>
+      <section><h2 class="h4">Abstract</h2><p class="t2">Use the updated abstract that describes the deployed model (colour stems, convex fusion, no DAPFT). The September 2026 abstract describes the proposal-era design.</p></section>
+      <section>
+        <h2 class="h4">How it works</h2>
+        <p>Each image is processed three ways for colour, then read by a ConvNeXt and a DINOv2 vision transformer side by side. Their features are blended at every scale, and two separate heads predict boxes and masks.</p>
+        <figure class="archfig" style="margin:var(--s3) 0 0">
+          <svg viewBox="0 0 760 170" role="img" aria-label="Pipeline: RGB image, three colour stems, ConvNeXt-T and DINOv2 ViT-L in parallel, convex fusion at each pyramid level, FPN, then a TOOD detection head and a SOLOv2 mask head.">
+            <g fill="none" stroke="var(--muted)" stroke-width="1"><path d="M92 85h22M196 85c14 0 10-40 26-40M196 85c14 0 10 40 26 40M352 45c14 0 10 40 26 40M352 125c14 0 10-40 26-40M486 85h22M582 85c14 0 10-34 26-34M582 85c14 0 10 34 26 34"/></g>
+            <g fill="none" stroke="var(--border)">
+              <rect x="8.5" y="62.5" width="83" height="45" rx="7"/><rect x="114.5" y="54.5" width="81" height="61" rx="7"/><rect x="222.5" y="24.5" width="129" height="41" rx="7"/><rect x="222.5" y="104.5" width="129" height="41" rx="7"/><rect x="378.5" y="58.5" width="107" height="53" rx="7"/><rect x="508.5" y="62.5" width="73" height="45" rx="7"/><rect x="608.5" y="30.5" width="143" height="41" rx="7"/><rect x="608.5" y="98.5" width="143" height="41" rx="7"/>
+            </g>
+            <g>
+              <text x="50" y="82" text-anchor="middle">RGB image</text><text x="50" y="98" text-anchor="middle" class="sub">640 × 480</text>
+              <text x="155" y="76" text-anchor="middle">Colour stems</text><text x="155" y="92" text-anchor="middle" class="sub">RGB · RedComp</text><text x="155" y="105" text-anchor="middle" class="sub">Shades-of-Gray</text>
+              <text x="287" y="43" text-anchor="middle">ConvNeXt-T</text><text x="287" y="58" text-anchor="middle" class="sub">texture and edges</text>
+              <text x="287" y="123" text-anchor="middle">DINOv2 ViT-L/14</text><text x="287" y="138" text-anchor="middle" class="sub">scene context</text>
+              <text x="432" y="80" text-anchor="middle">Convex fusion</text><text x="432" y="96" text-anchor="middle" class="sub">per level, then FPN</text>
+              <text x="545" y="89" text-anchor="middle">Pyramid</text>
+              <text x="680" y="49" text-anchor="middle">TOOD head</text><text x="680" y="64" text-anchor="middle" class="sub">class + box</text>
+              <text x="680" y="117" text-anchor="middle">SOLOv2 head</text><text x="680" y="132" text-anchor="middle" class="sub">instance masks</text>
+            </g>
+          </svg>
+          <figcaption class="cap t2" style="margin-top:8px">Figure 1. The deployed model (B0). Each block links to the ablation that tests it.</figcaption>
+        </figure>
+      </section>
+      <section>
+        <div class="row" style="justify-content:space-between"><h2 class="h4">Citation</h2><button class="btn btn-text btn-sm" type="button" id="copyBib">Copy BibTeX</button></div>
+<pre class="bib" id="bib">@thesis{garces2026seabednet,
+  author      = {Garces, Rolf Genree L.},
+  title       = {SeaBed-Net: Multicolor Hybrid CNN-ViT for
+                 Dual-Task Underwater Object Detection
+                 and Instance Segmentation},
+  type        = {Undergraduate thesis (BS Computer Science)},
+  institution = {University of the Philippines Tacloban},
+  address     = {Tacloban City, Philippines},
+  year        = {2026}
+}</pre>
+      </section>
+      <section>
+        <h2 class="h4">Acknowledgements</h2>
+        <p class="t2">Images from the J-EDI Organism Detection Dataset (JODD), JAMSTEC J-EDI (T. Nishio and Y. Kawae, <i>Data in Brief</i> 65, 112462, 2026). Instance masks from JODD-Seg, made for this thesis: SAM 3 pseudo-masks reviewed and corrected by three people. Backbones: ConvNeXt-T (ImageNet) and DINOv2 (Meta).</p>
+      </section>
+    </article>
+  </div>
+  <ul class="why">
+    <li><b>Reads like a paper's first page.</b>Title, subtitle, byline, links, abstract. No cards.</li>
+    <li><b>The architecture lives here now.</b>It explains the research, so it moved off the homepage.</li>
+  </ul>
+
+  <!-- EXPLORE -->
+  <div class="wf-h" id="wf-later"><h3 class="h3">Explore</h3><span>/explore · gallery and dataset · low fidelity</span></div>
+  <div class="frame">
+    <div class="chrome"><i></i><i></i><i></i><span class="url">seabed-lens / explore</span></div>
+    <nav class="s-nav line" aria-label="Site (wireframe)">
+      <a class="wordmark" href="#wf-home">SeaBed Lens</a>
+      <ul><li><a href="#wf-later" aria-current="page">Explore</a></li><li><a href="#wf-try">Try it</a></li><li><a href="#wf-results">Results</a></li><li><a href="#wf-about">About</a></li></ul>
+      <span class="sp"></span><div class="ext"><a href="#wf-home">GitHub</a><a href="#wf-about">Thesis</a></div><button class="btn btn-text btn-sm menu" type="button">Menu</button>
+    </nav>
+    <div class="later" style="padding:24px;gap:var(--s7)">
+      <div style="display:grid;gap:14px;align-content:start">
+        <h4 class="h3 serif">Twenty kinds of deep-sea life, and where the model gets each one wrong.</h4>
+        <div class="utabs" role="group" aria-label="Filter (wireframe)" data-seg><button type="button" aria-pressed="true">All</button><button type="button" aria-pressed="false">Clear</button><button type="button" aria-pressed="false">Typical</button><button type="button" aria-pressed="false">Fails</button></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><div class="well" data-scene="f" data-show="masks" style="border-radius:var(--r-ctl)"></div><div class="well" data-scene="d" data-show="masks" style="border-radius:var(--r-ctl)"></div><div class="well" data-scene="e" data-show="masks" style="border-radius:var(--r-ctl)"></div></div>
+        <p class="small t2">Failures included on purpose, each with one line on why. Opening an image takes it into Try it.</p>
+      </div>
+      <div style="display:grid;gap:14px;align-content:start">
+        <h4 class="h4">JODD-Seg</h4>
+        <div class="tbl"><table><thead><tr><th>Class</th><th class="n">Instances</th><th class="n">Reviewed</th></tr></thead><tbody>
+          <tr><td>Starfish</td><td class="n ph">—</td><td class="n ph">—</td></tr><tr><td>Sea cucumber</td><td class="n ph">—</td><td class="n ph">—</td></tr><tr><td>Crab</td><td class="n ph">—</td><td class="n ph">—</td></tr></tbody></table></div>
+        <p class="small t2">A class list with one example crop, instance count and review coverage, then how the masks were made: SAM 3, then three reviewers.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHONE -->
+  <div class="wf-h" id="wf-phone"><h3 class="h3">Try it on a phone</h3><span>≤ 640px</span></div>
+  <div class="phone-wrap">
+    <div class="phone"><div class="screen ws">
+      <nav class="s-nav" style="padding:12px 16px"><span class="wordmark">SeaBed Lens</span><span class="sp"></span><button class="btn btn-text btn-sm" type="button" style="display:inline-flex">Menu</button></nav>
+      <div style="padding:4px 0 0;display:grid;gap:12px">
+        <div class="well" data-scene="a" data-show="masks" style="border-radius:0"></div>
+        <div class="samples" style="padding:0 16px;color:var(--ws-text-2)"><span>Samples</span><div class="dots" id="phoneFilm"></div></div>
+      </div>
+      <div class="sheet">
+        <span class="grab"></span>
+        <div class="utabs" role="group" aria-label="Show (wireframe)" data-seg><button type="button" aria-pressed="false">Detection</button><button type="button" aria-pressed="true">Segmentation</button><button type="button" aria-pressed="false">Both</button></div>
+        <div class="row" style="justify-content:space-between"><b style="font-weight:500">8 boxes · 9 masks</b><button class="btn btn-text btn-sm" type="button">Show 8 classes</button></div>
+        <div class="ctl"><label for="p-thr">Score threshold <output>0.30</output></label><input type="range" id="p-thr" min="0.05" max="0.9" step="0.05" value="0.3"></div>
+        <button class="btn btn-primary" type="button" style="width:100%;min-height:44px">Upload a photo</button>
+      </div>
+    </div></div>
+    <ul class="why" style="max-width:420px;grid-template-columns:minmax(0,1fr);margin-top:0">
+      <li><b>The image runs edge to edge.</b>On a phone the image is the screen; nothing floats on it.</li>
+      <li><b>The sheet holds the controls.</b>View tabs, count, threshold and the upload button. Classes and instances open on request (shadcn Drawer on the 360ms drawer curve).</li>
+      <li><b>Controls sit low.</b>The thumb reaches the bottom third; every target is at least 44px.</li>
+    </ul>
+  </div>
+
+  <!-- LAB -->
+  <div class="wf-h" id="wf-lab"><h3 class="h3">Component Lab</h3><span>/lab · internal, linked from Try it and Results, not in the nav</span></div>
+  <div class="frame ws">
+    <div class="chrome"><i></i><i></i><i></i><span class="url">seabed-lens / lab</span></div>
+    <div class="labbar">
+      <a class="btn btn-text btn-sm" href="#wf-try" style="padding-left:0">← Try it</a>
+      <div class="row" id="vchips"></div>
+      <details class="addv" id="addv"><summary class="btn btn-text btn-sm">Add variant</summary><div class="menu-pop" id="vmenu"></div></details>
+      <span style="flex:1"></span>
+      <div class="utabs" role="tablist" aria-label="Compare mode" id="labMode" style="border-bottom:0">
+        <button type="button" role="tab" aria-selected="true" data-v="swipe">Swipe</button><button type="button" role="tab" aria-selected="false" data-v="side">Side by side</button><button type="button" role="tab" aria-selected="false" data-v="diff">Difference</button>
+      </div>
+    </div>
+    <div class="labstage">
+      <div id="labView"></div>
+      <div class="dlegend" id="labLegend"></div>
+      <div class="tbl"><table class="ltable">
+        <thead><tr><th>Variant</th><th>What changed</th><th class="grp" colspan="2">Test AP</th><th class="gap"></th><th class="grp" colspan="2">On this image</th></tr>
+        <tr><th></th><th></th><th class="n">box</th><th class="n">mask</th><th class="gap"></th><th class="n">boxes</th><th class="n">masks</th></tr></thead>
+        <tbody id="labRows"></tbody></table></div>
+      <div class="src"><span>Source: each variant's <code>*.test_eval_verified.json</code> · test split</span><a href="#wf-results">Full ablation table →</a></div>
+      <p class="hint" style="max-width:70ch">Each variant is its own trained checkpoint. Switching a branch off inside the full model would break parts trained to rely on it, so it wouldn't measure that branch's value.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MOTION ============ -->
+<section class="block" id="motion">
+  <header>
+    <h2 class="h2 serif">Motion</h2>
+    <p class="lede">Motion reports a state change and never delays a scientific interaction. Only <code>transform</code> and <code>opacity</code> animate, with <code>--ease-out</code> (0.23, 1, 0.32, 1). Under reduced motion, movement is dropped and fades shorten.</p>
+  </header>
+  <div class="tbl"><table>
+    <thead><tr><th>Moment</th><th>Why it moves</th><th>Motion</th></tr></thead>
+    <tbody>
+      <tr><td>Run status in Try it</td><td class="t2">Preventing a jarring change at the moment every visitor watches</td><td>Fades in and lifts 4px over 160ms with <code>@starting-style</code>; fades out over 120ms</td></tr>
+      <tr><td>Result arrives</td><td class="t2">State change</td><td>Overlay fades in over 220ms; the old result stays dimmed while running</td></tr>
+      <tr><td>Changing sample image</td><td class="t2">Preventing a jarring change</td><td>The new image crossfades over the old over 220ms, in step with its overlay. Opacity only</td></tr>
+      <tr><td>Add variant menu</td><td class="t2">Spatial: shows it came from its trigger</td><td>Scales from 0.97 at the top-left corner and fades, 150ms</td></tr>
+      <tr><td>Instances, More options</td><td class="t2">State: the section opens</td><td>Height and opacity over 220ms via <code>::details-content</code>; snaps where unsupported</td></tr>
+      <tr><td>Dragging a file over Try it</td><td class="t2">Feedback: shows where the drop lands</td><td>Overlay fades in over 150ms</td></tr>
+      <tr><td>Button press</td><td class="t2">Feedback</td><td><code>scale(.97)</code> over 120ms</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Left still on purpose: threshold and opacity sliders (data being read), hold-for-ground-truth (the flicker must be an instant cut), hover linking between list and image, Lab compare-mode switches and figure tabs.</p>
+</section>
+
+<!-- ============ BUILD ============ -->
+<section class="block" id="build">
+  <header>
+    <h2 class="h2 serif">Build mapping</h2>
+    <p class="lede">An incremental, reversible change: the same Next.js app and shadcn components, new tokens and fewer containers. Teal maps to shadcn's <code>--primary</code>. Workspace layouts wrap in <code>.ws</code>, which remaps the same variables.</p>
+  </header>
+<pre class="code">/* website/frontend/app/globals.css (Tailwind v4 + shadcn) */
+:root {             /* reading, light */
+  --background:#F7F8F6; --foreground:#17211F; --card:#FFFFFF; --popover:#FFFFFF;
+  --primary:#087E8B; --primary-foreground:#FFFFFF; --ring:#087E8B;
+  --secondary:#EEF1F0; --muted:#EEF1F0; --muted-foreground:#66716D; --accent:#EEF1F0;
+  --border:#D9DEDC; --input:#8A9591; --destructive:#C94B4B; --radius:7px;
+  --warning:#E7A93B; --success:#23845B; --info:#3D7FC4; --chart-1:#087E8B; --chart-2:#17211F;
+}
+.dark, .ws {        /* reading dark and the fixed workspace share one palette */
+  --background:#0B1516; --foreground:#E9EFED; --card:#101D1E; --popover:#101D1E;
+  --primary:#55B8C0; --primary-foreground:#0B1516; --ring:#55B8C0;
+  --secondary:#172526; --muted:#172526; --muted-foreground:#9AA8A5; --accent:#172526;
+  --border:#263536; --input:#74827E; --warning:#EAB45D; --well:#17191B;
+}</pre>
+  <div class="cols">
+    <div><h3 class="h4">Fonts</h3><p class="small t2"><code>next/font/google</code>: Inter, Source_Serif_4 (opsz) and JetBrains_Mono, self-hosted at build time.</p></div>
+    <div><h3 class="h4">Strip from shadcn defaults</h3><p class="small t2">Card shadows, pill-shaped ToggleGroup, ring glow on focus, Badge on non-status labels, bordered Table wrapper.</p></div>
+    <div><h3 class="h4">Components used</h3><p class="small t2">Tabs (view, compare, figures) · Slider · Switch · Collapsible · Drawer (phone) · DropdownMenu (Add variant) · HoverCard (footnotes) · Table + TanStack · Sonner (errors).</p></div>
+    <div><h3 class="h4">Canvas</h3><p class="small t2">Image on <code>&lt;canvas&gt;</code>, masks and boxes on an SVG layer with instance ids that drive hover in both directions. Filters re-render on the client.</p></div>
+  </div>
+</section>
+
+<!-- ============ OPEN ============ -->
+<section class="block" id="open">
+  <header><h2 class="h2 serif">Open questions</h2></header>
+  <ol class="qlist">
+    <li><b>Image licence (JAMSTEC J-EDI).</b> Decides whether the hero, samples and Explore can ship. Until then Home falls back to an upload-first hero on the same layout. If it isn't cleared in time, much NOAA Ocean Exploration ROV imagery is US-government work; check each image's credit line.</li>
+    <li><b>Explore's scope.</b> Gallery and dataset on one page, as drawn, or the gallery alone at first?</li>
+    <li><b>Adviser's name</b> for About and the citation.</li>
+    <li><b>Hosting during the defence.</b> GPU or CPU changes the wait-state copy.</li>
+    <li><b>Upload retention.</b> 24 h is shown as a proposal.</li>
+  </ol>
+</section>
+</main>
+</div>
+
+<script>
+(function(){
+  const root=document.documentElement;
+  /* theme preview */
+  const seg=document.getElementById('themeSeg');
+  function setTheme(t){ t?root.setAttribute('data-theme',t):root.removeAttribute('data-theme');
+    seg.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.t===t)));
+    try{localStorage.setItem('sbl-theme',t)}catch(e){} swatches(); }
+  seg.addEventListener('click',e=>{const b=e.target.closest('button'); if(b) setTheme(b.dataset.t)});
+  function swatches(){
+    const cs=getComputedStyle(root);
+    const R=[['--bg','Background','page'],['--surface','Surface','tables, popovers'],['--subtle','Subtle','hover, code'],['--border','Border','structure only'],['--text','Text',''],['--text-2','Secondary','lightest text'],['--muted','Muted','boundaries, never text'],['--ocean','Ocean','brand, primary action'],['--ocean-hover','Ocean dark','hover, pressed'],['--ocean-soft','Ocean soft','selected rows'],['--amber','Amber','attention, rare'],['--amber-soft','Amber soft','running state'],['--success','Success','success only'],['--error','Error','errors only'],['--info','Info','information only']];
+    const W=[['--ws-bg','Background',''],['--ws-surface','Surface',''],['--ws-subtle','Subtle',''],['--ws-border','Border',''],['--ws-text','Text',''],['--ws-text-2','Secondary',''],['--ws-muted','Muted','disabled only'],['--ws-ocean','Ocean','primary action'],['--ws-ocean-soft','Ocean soft',''],['--ws-amber','Amber','running state'],['--well','Image well','neutral, behind images']];
+    const f=L=>L.map(([v,n,u])=>`<div><i style="background:var(${v})"></i><span><b>${n}</b><code>${cs.getPropertyValue(v).trim()}</code>${u?' · '+u:''}</span></div>`).join('');
+    document.getElementById('swRead').innerHTML=f(R); document.getElementById('swWs').innerHTML=f(W);
+  }
+
+  /* palettes */
+  const CC=['#FF7A6B','#FFD25C','#5CE1A0','#FF9F43','#C89BFF','#FF86C8','#B6F05A','#6FD3FF','#F25F8B','#E8E06A','#9AA8FF','#FFB3A0','#4FE3E3','#D7A6FF','#FFC28A','#A6F0C6','#FF6FE0','#F5F5A3','#8FE36B','#FFA8E0'];
+  const CB=['#F5A623','#5DB8F0','#2FC59A','#F2E35C','#4F9BE0','#F07D3C','#E58BC2','#FFFFFF']; // Okabe-Ito, lightened for dark water
+  let pal=CC;
+  const col=k=>pal[k%pal.length];
+  document.getElementById('classgrid').innerHTML=CC.map((c,i)=>`<span><i style="background:${c}4d;color:${c}"></i>${i+1}</span>`).join('');
+
+  /* scenes (illustrations) */
+  const EX=['starfish','sea cucumber','crab','shrimp','fish','sea anemone','sponge','brittle star'];
+  const ORG=['#d98a5f','#8e6276','#cf6a45','#e3a7a2','#b9c3c6','#e9d4bb','#d8c98c','#c9a38d'];
+  const SCENES={
+    a:[{k:0,s:.94,m:.93,x:130,y:318,r:40},{k:1,s:.88,m:.90,x:318,y:262,r:24,e:2.6,rot:.35},{k:0,s:.81,m:.78,x:446,y:352,r:31},{k:2,s:.72,m:.69,x:520,y:206,r:27,e:1.3},
+       {k:4,s:.66,m:.61,x:372,y:122,r:15,e:2.6,rot:-.2},{k:6,s:.58,m:.62,x:236,y:404,r:30,e:1.4},{k:3,s:.41,m:null,x:206,y:168,r:10,e:2.6,rot:.8},{k:5,s:.35,m:.38,x:80,y:430,r:20},{k:1,s:.27,m:.31,x:566,y:424,r:16,e:2.2,rot:-.5},{k:7,s:null,m:.44,x:600,y:300,r:22}],
+    b:[{k:0,s:.96,m:.95,x:320,y:260,r:70},{k:5,s:.7,m:.72,x:140,y:380,r:28}],
+    c:[{k:1,s:.82,m:.8,x:220,y:300,r:30,e:2.8,rot:.2},{k:1,s:.76,m:.74,x:420,y:330,r:26,e:2.6,rot:-.3},{k:6,s:.6,m:.58,x:520,y:200,r:30}],
+    d:[{k:2,s:.88,m:.86,x:300,y:290,r:46,e:1.3},{k:3,s:.52,m:.5,x:470,y:190,r:14,e:2.6,rot:.5},{k:7,s:.47,m:.49,x:150,y:350,r:36}],
+    e:[{k:4,s:.42,m:.36,x:300,y:200,r:28,e:2.4,rot:.1},{k:0,s:.33,m:null,x:470,y:360,r:22}],
+    f:[{k:5,s:.9,m:.88,x:250,y:300,r:34},{k:5,s:.84,m:.83,x:380,y:320,r:30},{k:6,s:.71,m:.66,x:520,y:380,r:26}]
+  };
+  const VAR={
+    ref:{name:'Full model (B0)',what:'Reference',box:'0.6453',mask:'0.6380',drop:[],extra:[]},
+    vitb:{name:'Smaller ViT (ViT-B)',what:'DINOv2 ViT-L → ViT-B',drop:[6,8],extra:[]},
+    cvx:{name:'C2F_VITB_CVXMOS',what:'Earlier model',drop:[8],extra:[]},
+    mdual:{name:'C2F_MDUAL',what:'Earlier model',drop:[4,6,7,8],extra:[{k:3,s:.45,m:.4,x:470,y:120,r:12,e:2.4,rot:.4}]}
+  };
+  const PENDING=[['ViT-only','Tests the hybrid backbone'],['CNN-only','Tests the hybrid backbone'],['No colour stems','Tests colour processing'],['RGB-only stems','Tests colour processing'],['Gated fusion','Tests the fusion design']];
+
+  function rng(seed){let s=(seed*2654435761)>>>0||1;return()=>{s^=s<<13;s>>>=0;s^=s>>>17;s^=s<<5;s>>>=0;return s/4294967296}}
+  function mix(a,b,t){const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const A=p(a),B=p(b);return `rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')})`}
+  function shape(o,idx){
+    const r=rng(idx*97+o.k*13+7),p1=r()*6.28,p2=r()*6.28,e=o.e||1,rot=o.rot||0,star=(o.k===0||o.k===7),pts=[];
+    for(let i=0;i<56;i++){const t=i/56*Math.PI*2;
+      let rr=star?o.r*(0.38+0.62*Math.pow(Math.abs(Math.cos(2.5*t+p1)),2.2)):o.r;
+      rr*=1+0.07*Math.sin(3*t+p1)+0.05*Math.sin(5*t+p2);
+      const x=rr*e*Math.cos(t),y=rr*Math.sin(t);
+      pts.push([o.x+x*Math.cos(rot)-y*Math.sin(rot),o.y+x*Math.sin(rot)+y*Math.cos(rot)]);}
+    return pts;
+  }
+  function bbox(p){let a=1e9,b=1e9,c=-1e9,d=-1e9;p.forEach(([x,y])=>{a=Math.min(a,x);b=Math.min(b,y);c=Math.max(c,x);d=Math.max(d,y)});return[a,b,c-a,d-b]}
+  function area(p){let s=0;for(let i=0;i<p.length;i++){const[x1,y1]=p[i],[x2,y2]=p[(i+1)%p.length];s+=x1*y2-x2*y1}return Math.abs(s/2)}
+  const cache={};
+  function list(id,v){
+    const key=id+'|'+(v||''); if(cache[key]) return cache[key];
+    let L=SCENES[id].map((o,i)=>({...o,i}));
+    if(v){const V=VAR[v];L=L.map(o=>({...o,missing:V.drop.includes(o.i)}));V.extra.forEach((o,j)=>L.push({...o,i:100+j,extra:true}))}
+    L.forEach(o=>{o.pts=shape(o,o.i);o.box=bbox(o.pts);o.area=area(o.pts)});
+    const n={};[...L].sort((a,b)=>(b.m??b.s)-(a.m??a.s)).forEach(o=>{n[o.k]=(n[o.k]||0)+1;o.num=n[o.k]});
+    return cache[key]=L;
+  }
+  /* Placeholder frames, painted to read like an oblique ROV shot: a lamp-lit sediment floor, soft-focus
+     organisms with their own shading and shadow, backscatter and sensor grain. Each scene is painted once. */
+  const PAINT={};
+  function paint(id){
+    if(PAINT[id]) return PAINT[id];
+    const cv=document.createElement('canvas'),W=640,H=480,c=cv.getContext('2d'),r=rng(id.charCodeAt(0)*31);
+    cv.width=W;cv.height=H;
+    let g=c.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#071417');g.addColorStop(.28,'#163230');g.addColorStop(.7,'#2c4743');g.addColorStop(1,'#34504a');
+    c.fillStyle=g;c.fillRect(0,0,W,H);
+    /* sediment mottling, smaller toward the horizon */
+    c.save();c.filter='blur(7px)';
+    for(let i=0;i<260;i++){const y=60+r()*(H-40),d=.35+.65*(y/H),x=r()*W,s=(8+r()*46)*d,light=r()<.5;
+      c.fillStyle=light?`rgba(170,196,184,${.03+r()*.06})`:`rgba(4,14,14,${.06+r()*.12})`;
+      c.beginPath();c.ellipse(x,y,s*1.8,s*.55,0,0,6.283);c.fill()}
+    c.restore();
+    /* fine grain of the floor */
+    c.save();c.filter='blur(.5px)';
+    for(let i=0;i<2600;i++){const y=70+r()*(H-70),x=r()*W;c.fillStyle=r()<.5?`rgba(205,222,212,${.03+r()*.07})`:`rgba(0,10,10,${.05+r()*.1})`;c.fillRect(x,y,1+r()*1.6,1+r()*1.1)}
+    c.restore();
+    /* a few stones and burrows */
+    c.save();c.filter='blur(2px)';
+    for(let i=0;i<7;i++){const x=r()*W,y=180+r()*280,rx=8+r()*26,ry=rx*(.35+r()*.25);
+      c.fillStyle='rgba(0,8,8,.35)';c.beginPath();c.ellipse(x+3,y+4,rx,ry,0,0,6.283);c.fill();
+      const sg=c.createRadialGradient(x-rx*.3,y-ry*.4,1,x,y,rx);sg.addColorStop(0,'rgba(150,170,160,.45)');sg.addColorStop(1,'rgba(48,66,62,.45)');
+      c.fillStyle=sg;c.beginPath();c.ellipse(x,y,rx,ry,0,0,6.283);c.fill()}
+    c.restore();
+    /* organisms: contact shadow, then a shaded body slightly out of focus */
+    SCENES[id].forEach((o,i)=>{const p=shape(o,i),path=()=>{c.beginPath();p.forEach(([x,y],j)=>j?c.lineTo(x,y):c.moveTo(x,y));c.closePath()};
+      c.save();c.filter='blur(5px)';c.translate(5,8);path();c.fillStyle='rgba(0,6,6,.45)';c.fill();c.restore();
+      const R0=o.r*(o.e||1);
+      c.save();c.filter='blur(.9px)';path();
+      const bg=c.createRadialGradient(o.x-R0*.35,o.y-o.r*.45,o.r*.08,o.x,o.y,R0*1.15);
+      bg.addColorStop(0,mix(ORG[o.k],'#dfe9e2',.18));bg.addColorStop(.55,mix(ORG[o.k],'#3c5a54',.42));bg.addColorStop(1,mix(ORG[o.k],'#0e1f1d',.62));
+      c.fillStyle=bg;c.fill();
+      c.globalCompositeOperation='overlay';c.fillStyle='rgba(255,255,255,.06)';
+      for(let t=0;t<14;t++){const a=r()*6.283,d=r()*o.r*.6;c.beginPath();c.arc(o.x+Math.cos(a)*d*(o.e||1),o.y+Math.sin(a)*d,1+r()*2.2,0,6.283);c.fill()}
+      c.restore()});
+    /* ROV lamp: warm-white pool low centre, falling off into dark water */
+    g=c.createRadialGradient(330,330,20,330,330,380);g.addColorStop(0,'rgba(214,236,226,.20)');g.addColorStop(.45,'rgba(214,236,226,.06)');g.addColorStop(1,'rgba(214,236,226,0)');
+    c.fillStyle=g;c.fillRect(0,0,W,H);
+    g=c.createRadialGradient(330,300,150,330,300,500);g.addColorStop(0,'rgba(0,6,8,0)');g.addColorStop(1,'rgba(0,6,8,.82)');
+    c.fillStyle=g;c.fillRect(0,0,W,H);
+    /* backscatter: particles lit by the lamp, a few close to the lens and soft */
+    c.save();
+    for(let i=0;i<170;i++){const near=r()<.08,x=r()*W,y=r()*H,rad=near?3+r()*5:.5+r()*1.3;
+      c.filter=near?'blur(2.5px)':'blur(.3px)';c.fillStyle=`rgba(226,238,232,${near?.10+r()*.12:.10+r()*.35})`;c.beginPath();c.arc(x,y,rad,0,6.283);c.fill()}
+    c.restore();
+    /* sensor grain */
+    const im=c.getImageData(0,0,W,H),d=im.data;
+    for(let i=0;i<d.length;i+=4){const n=(r()-.5)*14;d[i]+=n;d[i+1]+=n;d[i+2]+=n}
+    c.putImageData(im,0,0);
+    return PAINT[id]=cv;
+  }
+  function drawScene(cv,id){cv.width=640;cv.height=480;cv.getContext('2d').drawImage(paint(id),0,0)}
+  const NS='http://www.w3.org/2000/svg';
+  const D=p=>'M'+p.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join('L')+'Z';
+  function lbl(x,y,t,c){const w=t.length*7+12,yy=y-20<0?Math.min(y+2,461):y-20;x=Math.max(0,Math.min(x,640-w));return `<g class="lbl"><rect x="${x.toFixed(1)}" y="${yy.toFixed(1)}" width="${w}" height="19" rx="2" fill="${c}"/><text x="${(x+5).toFixed(1)}" y="${(yy+14).toFixed(1)}" fill="#0B1516">${t}</text></g>`}
+
+  /* opts: mode, thr, op, off:Set, solo, hl, v (variant), diff, labels */
+  function overlay(L,o){
+    const thr=o.thr??.3,op=o.op??.3,vis=x=>!(o.off&&o.off.has(x.k));
+    const dim=x=>(o.solo!=null&&x.k!==o.solo)||(o.hl!=null&&x.i!==o.hl);
+    const sc=x=>Math.max(x.s??0,x.m??0);
+    const top=new Set(L.filter(x=>!x.missing&&vis(x)&&sc(x)>=thr).sort((a,b)=>sc(b)-sc(a)).slice(0,o.top??3).map(x=>x.i));
+    const show=x=>o.labels===true||(o.labels!==false&&(o.hl===x.i||(o.solo!=null&&o.solo===x.k)||(o.hl==null&&o.solo==null&&top.has(x.i))));
+    let out='';
+    if(o.mode==='gt'){L.forEach(x=>{if(x.extra)return;const c=col(x.k);out+=`<path d="${D(x.pts)}" fill="${c}" fill-opacity=".25" stroke="${c}" stroke-width="1.5" stroke-dasharray="5 3"/>`+lbl(x.box[0],x.box[1],EX[x.k],c)});return out}
+    if(o.diff){L.forEach(x=>{
+      if(x.missing) out+=`<path d="${D(x.pts)}" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="6 4"/>`+lbl(x.box[0],x.box[1],'missed','#ffffff');
+      else if(x.extra) out+=`<path d="${D(x.pts)}" fill="rgba(255,255,255,.15)" stroke="#fff" stroke-width="3"/>`+lbl(x.box[0],x.box[1],'only here','#ffffff');
+      else out+=`<path d="${D(x.pts)}" fill="#55595b" fill-opacity=".5" stroke="#7b8082" stroke-width="1"/>`;});return out}
+    const m=o.mode==='masks'||o.mode==='both', b=o.mode==='boxes'||o.mode==='both';
+    L.forEach(x=>{ if(x.missing||!vis(x)) return; const c=col(x.k), a=dim(x)?.12:1;
+      if(m&&x.m!=null&&x.m>=thr){
+        out+=`<g opacity="${a}"><path d="${D(x.pts)}" fill="none" stroke="#0B1516" stroke-opacity=".7" stroke-width="3.5"/><path data-i="${x.i}" d="${D(x.pts)}" fill="${c}" fill-opacity="${o.hl===x.i?Math.min(.85,op+.25):op}" stroke="${c}" stroke-width="${o.hl===x.i?3:1.5}"/>`;
+        if(o.mode==='masks'&&show(x)) out+=lbl(x.box[0],x.box[1],`${EX[x.k]} #${x.num}`,c);
+        out+='</g>';}
+      if(b&&x.s!=null&&x.s>=thr){const[X,Y,W,H]=x.box;
+        out+=`<g opacity="${a}"><rect data-i="${x.i}" x="${X.toFixed(1)}" y="${Y.toFixed(1)}" width="${W.toFixed(1)}" height="${H.toFixed(1)}" fill="transparent" stroke="${c}" stroke-width="2"/>`;
+        if(show(x)) out+=lbl(X,Y,`${EX[x.k]} ${x.s.toFixed(2)}`,c); out+='</g>';}
+    });
+    return out;
+  }
+  function ensure(el,id){
+    let cv=el.querySelector('canvas'); if(!cv){cv=document.createElement('canvas');cv.setAttribute('aria-hidden','true');el.prepend(cv)}
+    if(el._scene===id) return;
+    if(el._scene==null){drawScene(cv,id);el._scene=id;return}
+    /* crossfade: paint the new scene on top, fade it in, then drop the old one */
+    const nv=document.createElement('canvas');nv.setAttribute('aria-hidden','true');drawScene(nv,id);nv.style.transition='none';nv.style.opacity='0';cv.after(nv);el._scene=id;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{nv.style.transition='';nv.style.opacity='1'}));
+    const done=()=>{if(cv.isConnected)cv.remove()};nv.addEventListener('transitionend',done,{once:true});setTimeout(done,400);
+  }
+  function svgLayer(el,cls){let s=el.querySelector('svg.ov.'+cls);if(!s){s=document.createElementNS(NS,'svg');s.setAttribute('class','ov '+cls);s.setAttribute('viewBox','0 0 640 480');s.setAttribute('preserveAspectRatio','none');s.setAttribute('aria-hidden','true');const cs=el.querySelectorAll('canvas');cs[cs.length-1].after(s)}return s}
+  function fadeIn(s){s.style.transition='none';s.style.opacity='0';requestAnimationFrame(()=>requestAnimationFrame(()=>{s.style.transition='';s.style.opacity=''}))}
+
+  /* static wells */
+  document.querySelectorAll('.well[data-scene]').forEach(el=>{
+    ensure(el,el.dataset.scene);
+    if(el.dataset.show!=='none'&&!el.hasAttribute('data-live')&&el.id!=='heroWell') svgLayer(el,'a').innerHTML=overlay(list(el.dataset.scene),{mode:el.dataset.show});
+  });
+
+  /* HOME hero: swipe + strip */
+  const hero=document.getElementById('heroWell'),hr=document.getElementById('heroRange'),hh=document.getElementById('heroHandle'),strip=document.getElementById('heroStrip');
+  function heroSet(id,anim){ensure(hero,id);const s=svgLayer(hero,'a');s.innerHTML=overlay(list(id),{mode:'both'});if(anim)fadeIn(s);cut()}
+  function cut(){const v=hr.value;svgLayer(hero,'a').style.clipPath=`inset(0 0 0 ${v}%)`;hh.style.left=v+'%'}
+  hr.addEventListener('input',cut);
+  ['a','b','c','d','f'].forEach((id,i)=>{const w=document.createElement('div');w.className='well';w.tabIndex=0;w.setAttribute('role','button');w.setAttribute('aria-label','Example scene '+(i+1));w.setAttribute('aria-current',String(i===0));strip.appendChild(w);ensure(w,id);
+    const go=()=>{strip.querySelectorAll('.well').forEach(x=>x.setAttribute('aria-current',String(x===w)));heroSet(id,true)};
+    w.addEventListener('click',go);w.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}})});
+  heroSet('a',false);
+
+  /* TRY IT */
+  const T={scene:'a',mode:'both',thr:.3,op:.3,off:new Set(),solo:null,hl:null,gt:false};
+  const tw=document.getElementById('tryWell'), quad=document.getElementById('tryQuad');
+  const film=document.getElementById('film');
+  ['a','b','c','d','e','f'].forEach((id,i)=>{const w=document.createElement('div');w.className='well';w.tabIndex=0;w.setAttribute('role','button');w.setAttribute('aria-label','Sample '+(i+1));w.setAttribute('aria-current',String(i===0));film.appendChild(w);ensure(w,id);
+    const go=()=>{film.querySelectorAll('.well').forEach(x=>x.setAttribute('aria-current',String(x===w)));T.scene=id;T.off.clear();T.solo=null;T.hl=null;buildLegend();renderTry(true)};
+    w.addEventListener('click',go);w.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}})});
+  const up=document.createElement('button');up.type='button';up.className='up';up.textContent='Upload';film.appendChild(up);
+  up.addEventListener('click',()=>run(3200));
+  const pf=document.getElementById('phoneFilm');['a','b','c','d','f'].forEach((id,i)=>{const w=document.createElement('div');w.className='well';if(!i)w.setAttribute('aria-current','true');pf.appendChild(w);ensure(w,id)});
+
+  function renderTry(anim){
+    const L=list(T.scene); ensure(tw,T.scene);
+    const s=svgLayer(tw,'a'); s.innerHTML=overlay(L,{mode:T.gt?'gt':T.mode,thr:T.thr,op:T.op,off:T.off,solo:T.solo,hl:T.hl}); if(anim)fadeIn(s);
+    quad.querySelectorAll('.well').forEach(q=>{ensure(q,T.scene);const sh=q.dataset.show;if(sh==='none')return;svgLayer(q,'a').innerHTML=overlay(L,{mode:sh,thr:T.thr,op:T.op,off:T.off,solo:T.solo,hl:T.hl})});
+    const vis=L.filter(x=>!T.off.has(x.k)),nb=vis.filter(x=>x.s!=null&&x.s>=T.thr),nm=vis.filter(x=>x.m!=null&&x.m>=T.thr);
+    document.getElementById('sumLine').textContent=`${nb.length} boxes · ${nm.length} masks`;
+    const shown=x=>(T.mode!=='masks'&&x.s!=null&&x.s>=T.thr)||(T.mode!=='boxes'&&x.m!=null&&x.m>=T.thr);
+    document.querySelectorAll('#legend button').forEach(b=>{const k=+b.dataset.k;b.querySelector('span:last-child').textContent=L.filter(x=>x.k===k&&shown(x)).length;b.querySelector('i').style.background=col(k)});
+    const rows=vis.filter(x=>(x.s!=null&&x.s>=T.thr)||(x.m!=null&&x.m>=T.thr));
+    document.getElementById('instN').textContent=rows.length;
+    document.getElementById('instN').textContent=rows.length;
+    document.getElementById('instBody').innerHTML=rows.map(x=>`<tr data-i="${x.i}" class="${T.hl===x.i?'hl':''}"><td><i style="background:${col(x.k)}"></i>${EX[x.k]} #${x.num}</td><td class="n">${x.s!=null&&x.s>=T.thr?x.s.toFixed(2):'no box'}</td><td class="n">${Math.round(x.area).toLocaleString('en')} px</td></tr>`).join('');
+    document.getElementById('tryCap').textContent=T.gt?'Showing ground truth. Release to return.':'Sample · ground truth available · 640×480';
+  }
+  function buildLegend(){
+    const L=list(T.scene),cnt=k=>L.filter(x=>x.k===k).length,ks=[...new Set(L.map(x=>x.k))].sort((a,b)=>cnt(b)-cnt(a)||a-b);
+    const cap=s=>s[0].toUpperCase()+s.slice(1);
+    const lg=document.getElementById('legend');lg.classList.remove('all');
+    lg.innerHTML=ks.map((k,i)=>`<li class="${i>=3?'more':''}"><button type="button" aria-pressed="true" data-k="${k}" title="Click to hide, hover to isolate"><i></i><span>${cap(EX[k])}</span><span></span></button></li>`).join('');
+    const mb=document.getElementById('legendMore');mb.hidden=ks.length<=3;mb.setAttribute('aria-expanded','false');mb.textContent=`Show all ${ks.length} classes`;
+  }
+  const lg=document.getElementById('legend');
+  document.getElementById('legendMore').addEventListener('click',e=>{const b=e.currentTarget,on=!lg.classList.contains('all');lg.classList.toggle('all',on);b.setAttribute('aria-expanded',String(on));b.textContent=on?'Show fewer':`Show all ${lg.children.length} classes`});
+  lg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const k=+b.dataset.k,on=b.getAttribute('aria-pressed')==='true';b.setAttribute('aria-pressed',String(!on));on?T.off.add(k):T.off.delete(k);renderTry()});
+  lg.addEventListener('pointerover',e=>{const b=e.target.closest('button');if(!b||T.off.has(+b.dataset.k))return;T.solo=+b.dataset.k;renderTry()});
+  lg.addEventListener('pointerleave',()=>{T.solo=null;renderTry()});
+  lg.addEventListener('focusin',e=>{const b=e.target.closest('button');if(b){T.solo=+b.dataset.k;renderTry()}});
+  lg.addEventListener('focusout',()=>{T.solo=null;renderTry()});
+  const ib=document.getElementById('instBody');
+  ib.addEventListener('pointerover',e=>{const r=e.target.closest('tr');if(!r)return;const i=+r.dataset.i;if(T.hl!==i){T.hl=i;renderTry()}});
+  ib.addEventListener('pointerleave',()=>{T.hl=null;renderTry()});
+  [tw,quad].forEach(el=>{el.addEventListener('pointerover',e=>{const p=e.target.closest('[data-i]');if(!p||!el.contains(p))return;const i=+p.dataset.i;if(T.hl!==i){T.hl=i;renderTry();const row=ib.querySelector(`tr[data-i="${i}"]`);row&&row.scrollIntoView({block:'nearest'})}});
+    el.addEventListener('pointerleave',()=>{if(T.hl!=null){T.hl=null;renderTry()}})});
+  document.getElementById('t-show').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected',String(x===b)));T.mode=b.dataset.v;renderTry()});
+  const thr=document.getElementById('t-thr'),op=document.getElementById('t-op');
+  thr.addEventListener('input',()=>{T.thr=+thr.value;document.getElementById('t-thr-o').textContent=T.thr.toFixed(2);renderTry()});
+  op.addEventListener('input',()=>{T.op=+op.value;document.getElementById('t-op-o').textContent=T.op.toFixed(2);renderTry()});
+  document.getElementById('t-cb').addEventListener('change',e=>{pal=e.target.checked?CB:CC;renderTry()});
+  const hold=document.getElementById('holdGT');
+  const gtOn=()=>{T.gt=true;renderTry()},gtOff=()=>{if(T.gt){T.gt=false;renderTry()}};
+  hold.addEventListener('pointerdown',gtOn);['pointerup','pointerleave','pointercancel'].forEach(ev=>hold.addEventListener(ev,gtOff));
+  hold.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();gtOn()}});hold.addEventListener('keyup',gtOff);
+  const fv=document.getElementById('figView');
+  const qb=document.createElement('div');qb.className='row';qb.hidden=true;qb.innerHTML='<button class="btn btn-text btn-sm" type="button">← Single view</button><span class="hint">Same layout as the thesis figures</span>';quad.before(qb);
+  function figMode(on){fv.setAttribute('aria-pressed',String(on));quad.hidden=!on;qb.hidden=!on;document.getElementById('tryMain').hidden=on;renderTry()}
+  fv.addEventListener('click',()=>figMode(true)); qb.querySelector('button').addEventListener('click',()=>figMode(false));
+  let timer=null;
+  function run(ms){ if(timer) return; tw.classList.add('busy'); const t0=performance.now(),st=document.getElementById('statusTxt');
+    timer=setInterval(()=>{const s=(performance.now()-t0)/1000;st.textContent=`Running on CPU · ${s.toFixed(1)} s · usually about 10 s`;if(s*1000>=ms){clearInterval(timer);timer=null;tw.classList.remove('busy');renderTry(true)}},100)}
+  document.getElementById('t-tta').addEventListener('change',()=>run(2400));
+  buildLegend(); renderTry();
+  const tf=document.getElementById('tryFrame'),dz=document.getElementById('dropZone');let dragN=0;
+  tf.addEventListener('dragenter',e=>{e.preventDefault();dragN++;dz.classList.add('on')});
+  tf.addEventListener('dragover',e=>e.preventDefault());
+  tf.addEventListener('dragleave',()=>{if(--dragN<=0){dragN=0;dz.classList.remove('on')}});
+  tf.addEventListener('drop',e=>{e.preventDefault();dragN=0;dz.classList.remove('on');run(3200)});
+
+  /* LAB */
+  const Lb={vars:['ref','vitb'],mode:'swipe',hl:null,cut:50};
+  const view=document.getElementById('labView'),legend=document.getElementById('labLegend');
+  function counts(v){const L=list('a',v).filter(x=>!x.missing);return [L.filter(x=>x.s!=null&&x.s>=.3).length,L.filter(x=>x.m!=null&&x.m>=.3).length]}
+  function chips(){
+    document.getElementById('vchips').innerHTML=Lb.vars.map(v=>v==='ref'?`<span class="vchip ref">${VAR[v].name}</span>`:`<span class="vchip">${VAR[v].name}<button type="button" aria-label="Remove ${VAR[v].name}" data-rm="${v}">×</button></span>`).join('');
+    const full=Lb.vars.length>=4;
+    document.getElementById('vmenu').innerHTML='<h5>Trained</h5>'+['vitb','cvx','mdual'].map(v=>`<button type="button" data-add="${v}" ${Lb.vars.includes(v)||full?'disabled':''}>${VAR[v].name}<small>${VAR[v].what}${Lb.vars.includes(v)?' · added':''}</small></button>`).join('')
+      +'<h5>Pending ablation (no checkpoint yet)</h5>'+PENDING.map(([n,w])=>`<button type="button" disabled>${n}<small>${w}</small></button>`).join('')+(full?'<h5>Up to 4 variants. Remove one to add another.</h5>':'');
+    document.getElementById('labRows').innerHTML=Lb.vars.map(v=>{const[b,m]=counts(v),V=VAR[v];return `<tr><td>${V.name}</td><td class="t2">${V.what}</td><td class="n">${V.box||'<span class="ph">export</span>'}</td><td class="n">${V.mask||'<span class="ph">export</span>'}</td><td class="gap"></td><td class="n">${b}</td><td class="n">${m}</td></tr>`}).join('')
+      +PENDING.slice(0,1).map(([n])=>`<tr class="pend"><td>${n}</td><td>Pending ablation</td><td class="n">—</td><td class="n">—</td><td class="gap"></td><td class="n">—</td><td class="n">—</td></tr>`).join('');
+  }
+  function labRender(build){
+    const others=Lb.vars.filter(v=>v!=='ref');
+    if(build){
+      view.innerHTML='';
+      if(Lb.mode==='swipe'){
+        const b=others[0]||'ref';
+        view.innerHTML=`<div class="well swipe labmain" id="labSwipe"><span class="wcap side-l">${VAR.ref.name}</span><span class="wcap side-r">${VAR[b].name}</span><input type="range" min="0" max="100" value="${Lb.cut}" aria-label="Drag to compare the two variants"><span class="handle"></span></div>`;
+        if(others.length>1) view.insertAdjacentHTML('beforeend',`<p class="hint" style="text-align:center;margin-top:8px">Swipe compares B0 with the first variant. Switch to Side by side to see all ${Lb.vars.length}.</p>`);
+      } else if(Lb.mode==='side'){
+        view.innerHTML=`<div class="labgrid" style="--n:${Math.min(Lb.vars.length,4)}">${Lb.vars.map(v=>`<div class="well" data-v="${v}"><span class="wcap">${VAR[v].name}</span></div>`).join('')}</div>`;
+      } else {
+        view.innerHTML=others.length?`<div class="labgrid" style="--n:${Math.min(others.length,3)}">${others.map(v=>`<div class="well" data-v="${v}" data-diff><span class="wcap">${VAR[v].name} vs B0</span></div>`).join('')}</div>`:'<p class="hint">Add a variant to see what it misses compared with B0.</p>';
+      }
+      view.querySelectorAll('.well').forEach(w=>ensure(w,'a'));
+      legend.innerHTML=Lb.mode==='diff'?'<span><i style="border:2px dashed #fff"></i>Missed (B0 found it)</span><span><i style="border:2.5px solid #fff;background:rgb(255 255 255 / .15)"></i>Found only by this variant</span><span><i style="background:#55595b"></i>Found by both</span>':(Lb.mode==='side'?'<span>Hover an organism to highlight it in every view.</span>':'<span>Drag the divider. Arrow keys move it too.</span>');
+      const sw=document.getElementById('labSwipe');
+      if(sw){const r=sw.querySelector('input'),h=sw.querySelector('.handle');const c=()=>{Lb.cut=+r.value;sw.querySelector('svg.ov.a').style.clipPath=`inset(0 ${100-Lb.cut}% 0 0)`;sw.querySelector('svg.ov.b').style.clipPath=`inset(0 0 0 ${Lb.cut}%)`;h.style.left=Lb.cut+'%'};r.addEventListener('input',c);sw._c=c}
+    }
+    const sw=document.getElementById('labSwipe');
+    if(sw){const b=others[0]||'ref';svgLayer(sw,'a').innerHTML=overlay(list('a','ref'),{mode:'masks',labels:false});svgLayer(sw,'b').innerHTML=overlay(list('a',b),{mode:'masks',labels:false});sw._c()}
+    view.querySelectorAll('.labgrid .well').forEach(w=>{const v=w.dataset.v;svgLayer(w,'a').innerHTML=overlay(list('a',v),w.hasAttribute('data-diff')?{diff:true}:{mode:'masks',labels:false,hl:Lb.hl})});
+  }
+  view.addEventListener('pointerover',e=>{if(Lb.mode!=='side')return;const p=e.target.closest('[data-i]');const i=p?+p.dataset.i:null;if(i!==Lb.hl){Lb.hl=i;labRender(false)}});
+  view.addEventListener('pointerleave',()=>{if(Lb.hl!=null){Lb.hl=null;labRender(false)}});
+  document.getElementById('labMode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected',String(x===b)));Lb.mode=b.dataset.v;labRender(true)});
+  document.getElementById('vchips').addEventListener('click',e=>{const b=e.target.closest('[data-rm]');if(!b)return;Lb.vars=Lb.vars.filter(v=>v!==b.dataset.rm);chips();labRender(true)});
+  document.getElementById('vmenu').addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b||b.disabled)return;Lb.vars.push(b.dataset.add);document.getElementById('addv').open=false;chips();labRender(true)});
+  chips(); labRender(true);
+
+  /* figure tabs */
+  document.querySelectorAll('[data-tabs]').forEach(t=>t.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const g=t.dataset.tabs;
+    t.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
+    document.querySelectorAll(`[data-panel^="${g}-"]`).forEach(p=>p.hidden=p.dataset.panel!==`${g}-${b.dataset.p}`)}));
+  document.querySelectorAll('[data-seg]').forEach(g=>g.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))}));
+
+  document.getElementById('copyBib').addEventListener('click',async e=>{const btn=e.currentTarget,el=document.getElementById('bib');const txt=el.textContent.replace(/\n\s{17}/g,' ');
+    try{await navigator.clipboard.writeText(txt);btn.textContent='Copied'}catch(err){const s=getSelection(),r=document.createRange();r.selectNodeContents(el);s.removeAllRanges();s.addRange(r);btn.textContent='Selected, press Ctrl+C'}
+    setTimeout(()=>btn.textContent='Copy BibTeX',1800)});
+
+  let saved='';try{saved=localStorage.getItem('sbl-theme')||''}catch(e){}
+  setTheme(saved);
+})();
+</script>
+
+</body></html>
