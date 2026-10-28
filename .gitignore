@@ -6,6 +6,10 @@
 
 # Claude Code: personal settings stay local (the shared .claude/settings.json is committed)
 .claude/settings.local.json
+.claude
+.githooks
+.specify
+CLAUDE.md
 
 # Local-only notes (e.g. HANDOFF.local.md, the agents' git hand-over log)
 *.local.md
