@@ -4,11 +4,11 @@
 .vscode/*
 !.vscode/extensions.json
 
-# Claude Code: personal settings stay local (the shared .claude/settings.json is committed)
-.claude/settings.local.json
-.claude
-.githooks
-.specify
+# Kept local for now, not on GitHub: agent settings and hooks, git hooks, constitution, agent instructions.
+# Fresh clones need these copied over before running setup/install-guardrails.sh.
+.claude/
+.githooks/
+.specify/
 CLAUDE.md
 
 # Local-only notes (e.g. HANDOFF.local.md, the agents' git hand-over log)
