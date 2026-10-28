@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
+import { JetBrains_Mono, Source_Serif_4 } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
+// Local file, not Google's subset: Google's Inter drops the cv11 and ss01 features (tasks T025).
+const inter = localFont({
+  src: "./fonts/InterVariable.woff2",
+  weight: "100 900",
   display: "swap",
   variable: "--font-inter",
 });

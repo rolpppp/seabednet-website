@@ -1,0 +1,333 @@
+@import "tailwindcss";
+
+/*
+  SeaBed Lens tokens. The only place a colour, radius, shadow, duration or easing value is written.
+  Values are transcribed from docs/design-system.md (DS) sections 5.1, 6, 7, 12 and 15.
+  Raw palette = --ds-* (DS names with a prefix, plan R1). Semantic layer = shadcn names (DS section 15),
+  defined only as var() references so the dark theme and the workspace share one set of values (DS section 6.2).
+*/
+
+:root {
+  color-scheme: light dark;
+
+  /* DS 6.1 light */
+  --ds-bg: #F7F8F6;
+  --ds-surface: #FFFFFF;
+  --ds-subtle: #EEF1F0;
+  --ds-border: #D9DEDC;
+  --ds-text: #17211F;
+  --ds-text-2: #66716D;
+  --ds-muted: #8A9591;
+  --ds-ocean: #087E8B;
+  --ds-ocean-hover: #05616A;
+  --ds-ocean-soft: #E3F2F3;
+  --ds-amber: #E7A93B;
+  --ds-amber-soft: #FFF3D8;
+  --ds-success: #23845B;
+  --ds-error: #C94B4B;
+  --ds-info: #3D7FC4;
+  --ds-on-ocean: #FFFFFF;
+
+  /* DS 6.2 dark workspace */
+  --ds-ws-bg: #0B1516;
+  --ds-ws-surface: #101D1E;
+  --ds-ws-subtle: #172526;
+  --ds-ws-border: #263536;
+  --ds-ws-text: #E9EFED;
+  --ds-ws-text-2: #9AA8A5;
+  --ds-ws-muted: #74827E;
+  --ds-ws-ocean: #55B8C0;
+  --ds-ws-ocean-soft: #183638;
+  --ds-ws-amber: #EAB45D;
+  --ds-ws-on-ocean: #0B1516;
+  --ds-well: #17191B;
+
+  /* DS 7 shape and shadow */
+  --ds-radius-tag: 5px;
+  --ds-radius-control: 7px;
+  --ds-radius-card: 10px;
+  --ds-radius-well: 12px;
+  --ds-pop-shadow: 0 1px 2px rgb(23 33 31/.06), 0 8px 24px rgb(23 33 31/.12);
+  --ds-pop-shadow-ws: 0 8px 24px rgb(0 0 0/.45);
+
+  /* DS 12 motion */
+  --ds-ease-out: cubic-bezier(0.23,1,0.32,1);
+  --ds-ease-drawer: cubic-bezier(0.32,0.72,0,1);
+  --ds-d-press: 120ms;
+  --ds-d-micro: 160ms;
+  --ds-d-ui: 220ms;
+  --ds-d-sheet: 360ms;
+
+  /* Semantic layer, light (DS 15) */
+  --background: var(--ds-bg);
+  --foreground: var(--ds-text);
+  --card: var(--ds-surface);
+  --popover: var(--ds-surface);
+  --primary: var(--ds-ocean);
+  --primary-foreground: var(--ds-on-ocean);
+  --ring: var(--ds-ocean);
+  --secondary: var(--ds-subtle);
+  --muted: var(--ds-subtle);
+  --muted-foreground: var(--ds-text-2);
+  --accent: var(--ds-subtle);
+  --border: var(--ds-border);
+  --input: var(--ds-muted);
+  --destructive: var(--ds-error);
+  --radius: var(--ds-radius-control);
+  --warning: var(--ds-amber);
+  --success: var(--ds-success);
+  --info: var(--ds-info);
+  --chart-1: var(--ds-ocean);
+  --chart-2: var(--ds-text);
+  --well: var(--ds-well);
+  /* DS-only roles with no shadcn name */
+  --ocean-soft: var(--ds-ocean-soft);
+  --amber-soft: var(--ds-amber-soft);
+  --pop-shadow: var(--ds-pop-shadow);
+}
+
+/* Dark reading theme (system preference) reuses the workspace values (DS 6.2). */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--ds-ws-bg);
+    --foreground: var(--ds-ws-text);
+    --card: var(--ds-ws-surface);
+    --popover: var(--ds-ws-surface);
+    --primary: var(--ds-ws-ocean);
+    --primary-foreground: var(--ds-ws-on-ocean);
+    --ring: var(--ds-ws-ocean);
+    --secondary: var(--ds-ws-subtle);
+    --muted: var(--ds-ws-subtle);
+    --muted-foreground: var(--ds-ws-text-2);
+    --accent: var(--ds-ws-subtle);
+    --border: var(--ds-ws-border);
+    --input: var(--ds-ws-muted);
+    --warning: var(--ds-ws-amber);
+    --well: var(--ds-well);
+    --ocean-soft: var(--ds-ws-ocean-soft);
+    --pop-shadow: var(--ds-pop-shadow-ws);
+  }
+}
+
+/* Workspace: dark in both themes. Same names, same values as the dark block above. */
+.ws {
+  color-scheme: dark;
+  --background: var(--ds-ws-bg);
+  --foreground: var(--ds-ws-text);
+  --card: var(--ds-ws-surface);
+  --popover: var(--ds-ws-surface);
+  --primary: var(--ds-ws-ocean);
+  --primary-foreground: var(--ds-ws-on-ocean);
+  --ring: var(--ds-ws-ocean);
+  --secondary: var(--ds-ws-subtle);
+  --muted: var(--ds-ws-subtle);
+  --muted-foreground: var(--ds-ws-text-2);
+  --accent: var(--ds-ws-subtle);
+  --border: var(--ds-ws-border);
+  --input: var(--ds-ws-muted);
+  --warning: var(--ds-ws-amber);
+  --well: var(--ds-well);
+  --ocean-soft: var(--ds-ws-ocean-soft);
+  --pop-shadow: var(--ds-pop-shadow-ws);
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-popover: var(--popover);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-ring: var(--ring);
+  --color-secondary: var(--secondary);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-destructive: var(--destructive);
+  --color-warning: var(--warning);
+  --color-success: var(--success);
+  --color-info: var(--info);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-well: var(--well);
+  /* DS-only roles: ocean = the primary interaction colour in both themes, amber = the attention colour */
+  --color-ocean: var(--primary);
+  --color-ocean-soft: var(--ocean-soft);
+  --color-amber: var(--warning);
+  --color-amber-soft: var(--amber-soft);
+
+  --radius-tag: var(--ds-radius-tag);
+  --radius-control: var(--ds-radius-control);
+  --radius-card: var(--ds-radius-card);
+  --radius-well: var(--ds-radius-well);
+
+  --shadow-pop: var(--pop-shadow);
+
+  --ease-out: var(--ds-ease-out);
+  --ease-drawer: var(--ds-ease-drawer);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-source-serif), ui-serif, Georgia, serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  /* DS 7 spacing scale 4 8 12 16 24 32 48 64 96 = p-1 p-2 p-3 p-4 p-6 p-8 p-12 p-16 p-24 */
+  --spacing: 4px;
+
+  /* Container width at which the nav switches from the menu to inline links (DS 9.13); gives the @nav: variant */
+  --container-nav: 47.5rem;
+}
+
+/* Durations (DS 12), used as duration-press, duration-micro, duration-ui, duration-sheet */
+@utility duration-press {
+  transition-duration: var(--ds-d-press);
+}
+@utility duration-micro {
+  transition-duration: var(--ds-d-micro);
+}
+@utility duration-ui {
+  transition-duration: var(--ds-d-ui);
+}
+@utility duration-sheet {
+  transition-duration: var(--ds-d-sheet);
+}
+
+/* Type scale (DS 5.1), size / line height in px converted to rem at 16 px. */
+@utility text-display {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 3rem;
+  line-height: 3.5rem;
+  letter-spacing: -0.01em;
+  @container (width < 40rem) {
+    font-size: 2.25rem;
+    line-height: 2.75rem;
+  }
+}
+@utility text-h1 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 2.25rem;
+  line-height: 2.75rem;
+  @container (width < 40rem) {
+    font-size: 1.75rem;
+    line-height: 2.25rem;
+  }
+}
+@utility text-h2 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 1.75rem;
+  line-height: 2.25rem;
+}
+@utility text-h3 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 1.3125rem;
+  line-height: 1.75rem;
+}
+@utility text-h4 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.0625rem;
+  line-height: 1.5rem;
+}
+@utility text-body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5625rem;
+}
+@utility text-body-long {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 1.0625rem;
+  line-height: 1.75rem;
+}
+@utility text-small {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+@utility text-caption {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.0625rem;
+}
+@utility text-data {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-variant-numeric: tabular-nums;
+}
+@utility text-code {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.8125rem;
+  line-height: 1.1875rem;
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--border);
+  }
+
+  body {
+    container-type: inline-size;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    font-size: 1rem;
+    line-height: 1.5625rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Never remove the outline (DS 13). */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Hover only where hover exists. */
+  @media (hover: hover) and (pointer: fine) {
+    a:hover {
+      color: var(--primary);
+    }
+  }
+
+  /* 44 px touch targets on coarse pointers. */
+  @media (pointer: coarse) {
+    :where(button, [role="button"], [role="tab"], select, summary, input:not([type="range"], [type="checkbox"])) {
+      min-height: 44px;
+    }
+  }
+
+  /* Placeholder for a missing fact: visibly unfinished (DS 9.8). */
+  .ph {
+    text-decoration: underline dashed;
+    text-underline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      transform: none !important;
+      translate: none !important;
+      scale: none !important;
+      transition-duration: 120ms !important;
+      animation-duration: 120ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
