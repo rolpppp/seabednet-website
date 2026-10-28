@@ -78,36 +78,6 @@ pnpm check              # everything: types, lint, token checks, unit tests, bui
 `next build` downloads the three typefaces at build time and serves them from the site itself, so the build needs
 internet access.
 
-## How work is done here
-
-The project is built with spec-driven development. Before changing anything, read:
-
-| File | For |
-|---|---|
-| [`.specify/memory/constitution.md`](.specify/memory/constitution.md) | The rules every change must follow. It overrides everything else. |
-| [`specs/README.md`](specs/README.md) | Roadmap, build order and the spec → plan → tasks → implement workflow |
-| [`docs/design-system.md`](docs/design-system.md) | The binding visual system: tokens, components, layouts, motion, copy |
-| [`CLAUDE.md`](CLAUDE.md) | Instructions for coding agents |
-
-Coding agents never write to git. They leave changes in the working tree and hand Rolf a copy-paste-ready block:
-
-```sh
-git add path/to/file
-git commit -m "feat: add site data export script"
-```
-
-Types: `feat` (new), `fix` (correction), `refactor` (restructure, same meaning), `del` (removal). Rolf reviews
-`git diff`, commits under his own identity and pushes. `CLAUDE.md` §1 has the full rules and how they are enforced.
-
-### One-time setup on Rolf's machine
-
-```sh
-git config user.name  "Rolf Genree L. Garces"
-git config user.email "<your GitHub email or ID+username@users.noreply.github.com>"
-sh setup/install-guardrails.sh   # Claude Code settings + hook, and git hooks via core.hooksPath
-brew install jq                  # used by the agents' git hook
-```
-
 ## Citation
 
 ```bibtex
