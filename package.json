@@ -1,0 +1,16 @@
+{
+  "name": "seabed-lens",
+  "private": true,
+  "packageManager": "pnpm@12.14.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "check": "pnpm check:frontend && pnpm check:backend",
+    "check:frontend": "pnpm --filter frontend check:frontend",
+    "check:backend": "uv run --directory backend ruff check . && uv run --directory backend ruff format --check . && uv run --directory backend pytest",
+    "setup": "pnpm install && uv sync --directory backend",
+    "setup:browsers": "pnpm --filter frontend exec playwright install chromium",
+    "setup:browsers:ci": "pnpm --filter frontend exec playwright install --with-deps chromium"
+  }
+}

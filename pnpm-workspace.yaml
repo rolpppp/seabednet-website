@@ -1,0 +1,6 @@
+packages:
+  - frontend
+allowBuilds:
+  "@tailwindcss/oxide": true
+  sharp: true
+  unrs-resolver: true
