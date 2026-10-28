@@ -1,0 +1,41 @@
+# OS / editors
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Claude Code: personal settings stay local (the shared .claude/settings.json is committed)
+.claude/settings.local.json
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Node / Next.js
+node_modules/
+frontend/.next/
+frontend/out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Model weights and large data never go in git
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+data/uploads/
+data/precomputed/
+
+# Test output
+frontend/test-results/
+frontend/playwright-report/
+coverage/
