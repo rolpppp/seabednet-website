@@ -105,6 +105,7 @@ Page content (features 004–009), the inference API (003), data export (002), d
 
 ## Open questions
 
-- [NEEDS CLARIFICATION: package manager — pnpm, npm or bun?] (recommendation: pnpm)
-- [NEEDS CLARIFICATION: where will CI run — GitHub Actions on the repo, or local checks only?]
+- ~~Package manager~~ — resolved 2026-10-29: **pnpm**.
+- ~~Where CI runs~~ — resolved 2026-10-29: **GitHub Actions** on push and pull requests, read-only permissions, running
+  the same single check command that runs locally (FR-010).
 - [NEEDS CLARIFICATION: GitHub repository URL for the nav's GitHub link]
